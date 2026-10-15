@@ -56,8 +56,7 @@
 
   /* ---- header ---- */
   header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;
-    background:linear-gradient(var(--bg),color-mix(in srgb,var(--bg) 70%,transparent));
-    backdrop-filter:blur(10px);padding:14px 20px 12px;border-bottom:1px solid var(--line)}
+    background:var(--bg);padding:14px 20px 12px;border-bottom:1px solid var(--line)}
   .brandrow{display:flex;align-items:center;gap:10px}
   .mark{width:30px;height:30px;color:var(--accent);flex:none}
   .brandrow .nm{font-family:var(--display);font-weight:600;font-size:17px;letter-spacing:.2px}
@@ -214,7 +213,7 @@
 
   /* ---- tabs ---- */
   nav.tabs{position:fixed;bottom:0;left:0;right:0;z-index:30;display:flex;justify-content:center;
-    background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(16px);
+    background:var(--surface);
     border-top:1px solid var(--line);padding:9px 12px calc(9px + env(safe-area-inset-bottom,0px))}
   nav.tabs .inner{display:flex;max-width:var(--maxw);width:100%}
   .tab{flex:1;background:transparent;border:none;color:var(--faint);cursor:pointer;font:inherit;
