@@ -252,6 +252,32 @@
   .sect-body details.guide{box-shadow:none;background:var(--card-soft)}
   .sect-body .rowcard.sub{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}
   .sub-k{text-transform:uppercase;letter-spacing:.12em;font-size:10.5px;font-weight:700;color:var(--faint);margin:18px 0 4px}
+  /* ---- Hoje compacto ---- */
+  .chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:10px}
+  .chips:not(:has(.chip:not([hidden]))){display:none}
+  .chip{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:var(--r-sm);
+    background:var(--card);border:1px solid var(--line);min-width:0}
+  .chip[hidden]{display:none}
+  .chip-k{display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+  .chip-k .i{width:13px;height:13px}
+  .chip b{font-family:var(--display);font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.15}
+  .chip-n{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .chip-n.late{color:#f0a15f}
+  .chip-bar{height:4px;border-radius:999px;background:var(--card-soft);overflow:hidden;margin:3px 0 1px}
+  .chip-bar span{display:block;height:100%;background:var(--accent);border-radius:999px}
+  .hardline{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px;padding:8px 12px;border-radius:999px;
+    font-size:12.5px;color:var(--muted);background:color-mix(in srgb,#8fb3e0 10%,transparent);border:1px solid color-mix(in srgb,#8fb3e0 22%,transparent)}
+  .hardline[hidden]{display:none}
+  .linkbtn{all:unset;cursor:pointer;color:var(--accent);font-weight:700;font-size:12.5px;white-space:nowrap}
+  #cheer{display:none!important}
+  .moodrow{display:flex;align-items:center;gap:10px;margin-top:10px;padding:8px 12px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm)}
+  .moodrow .mood-q{font-size:12px;color:var(--muted);font-weight:600}
+  .moodrow .mood-opts{flex:1;margin-top:0;gap:6px}
+  .moodrow .mood-dot{height:26px}
+  .moodrow .mood-label{font-size:12px;font-weight:600;min-width:42px;text-align:right}
+  .verse-mini{padding:4px 2px 0}
+  .verse-mini .verse{font-family:var(--display);font-size:16px;line-height:1.5;padding-left:0;font-weight:500}
+  .verse-mini .verse-ref{padding-left:0;margin-top:6px;font-size:11px}
   .hardbanner{display:flex;align-items:center;gap:12px;margin-top:12px;padding:12px 14px;border-radius:var(--r-sm);
     background:color-mix(in srgb,#8fb3e0 12%,var(--card));border:1px solid color-mix(in srgb,#8fb3e0 30%,transparent);font-size:13px;line-height:1.45}
   .hardbanner span{flex:1}
@@ -328,28 +354,24 @@
           </div>
         </div>
       </div>
-      <div class="sleepcard" id="sleepCard" hidden>
-        <span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg></span>
-        <div class="mid"><div class="sl-k">Sua noite</div><div class="sl-v" id="sleepLine"></div><div class="sl-goal" id="sleepGoal"></div></div>
-        <div class="sl-dur" id="sleepDur"></div>
+      <!-- resumo compacto do dia: sono e redes lado a lado (toque abre a Jornada) -->
+      <div class="chips">
+        <button class="chip" id="sleepCard" hidden data-go="jornada">
+          <span class="chip-k"><svg class="i" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>Sono</span>
+          <b id="sleepDur"></b><span class="chip-n" id="sleepGoal"></span><span id="sleepLine" hidden></span>
+        </button>
+        <button class="chip" id="screenCard" hidden data-go="jornada">
+          <span class="chip-k"><svg class="i" viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg>Redes</span>
+          <b id="screenDur"></b><div class="chip-bar"><span id="screenBar" style="width:0%"></span></div><span class="chip-n" id="screenNote"></span>
+        </button>
       </div>
-      <div class="sleepcard" id="screenCard" hidden>
-        <span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg></span>
-        <div class="mid"><div class="sl-k">Redes sociais hoje</div>
-          <div class="bar" style="margin-top:7px"><span id="screenBar" style="width:0%"></span></div>
-          <div class="sl-goal" id="screenNote"></div></div>
-        <div class="sl-dur" id="screenDur"></div>
-      </div>
-      <div class="hardbanner" id="hardBanner" hidden><span id="hardWhy"></span><button class="btn sm ghost" id="hardFull">Mostrar tudo</button></div>
-      <div class="cheer" id="cheer" hidden><svg class="i" viewBox="0 0 24 24"><path d="M12 3l1.9 3.9 4.3.6-3.1 3 .7 4.3L12 16.8 8.2 14.8l.7-4.3-3.1-3 4.3-.6L12 3Z"/></svg>Você apareceu hoje. Isso já é vitória.</div>
-      <div class="mood">
-        <div class="mood-top"><span>Como você está hoje?</span><span class="mood-label" id="moodLabel"></span></div>
-        <div class="mood-opts" id="moodOpts"></div>
-      </div>
-      <div class="eyebrow">Palavra de hoje</div>
-      <div class="card verse-card"><div class="quote">”</div><div class="verse" id="verseTextHoje"></div><div class="verse-ref" id="verseRefHoje"></div></div>
+      <div class="hardline" id="hardBanner" hidden><span id="hardWhy"></span><button class="linkbtn" id="hardFull">Mostrar tudo</button></div>
+      <div class="cheer" id="cheer" hidden></div>
+      <div class="moodrow"><span class="mood-q">Humor</span><div class="mood-opts" id="moodOpts"></div><span class="mood-label" id="moodLabel"></span></div>
       <div class="eyebrow">Hoje</div>
       <div class="tasks" id="taskList"></div>
+      <div class="eyebrow">Palavra de hoje</div>
+      <div class="verse-mini"><div class="verse" id="verseTextHoje"></div><div class="verse-ref" id="verseRefHoje"></div></div>
     </section>
 
     <section class="view" id="v-jornada">
@@ -673,7 +695,7 @@
   const ESSENCIAIS=["acordar","orar","dormir"];
   function hardDay(){if(!day||day.full)return false;const s=(typeof sleepRows!=="undefined")&&sleepRows.find(r=>r.night===dateKey);
     return !!(s&&s.minutes<360)||day.mood===1||day.mood===2;}
-  function hardReason(){const s=sleepRows.find(r=>r.night===dateKey);return s&&s.minutes<360?("você dormiu "+durTxt(s.minutes)):"seu dia está pesado";}
+  function hardReason(){const s=sleepRows.find(r=>r.night===dateKey);return s&&s.minutes<360?("dormiu "+durTxt(s.minutes)):"humor baixo";}
   const isDone=iid=>!!(day&&day.completed&&day.completed[iid]);
   const iconFor=b=>(b&&b.icon)||BLOCK_ICON[b&&b.id]||"star";
 
@@ -697,7 +719,7 @@
       : done===inst.length?"Dia completo. Que orgulho de você."
       : done===0?"Seu dia começa com um passo." : "Bom ritmo. Siga assim, com calma.";
     $("#cheer").hidden=done===0;
-    const hd=hardDay();$("#hardBanner").hidden=!hd;if(hd)$("#hardWhy").textContent="Dia mais leve: "+hardReason()+". Hoje só o essencial — sem cobrar o resto.";
+    const hd=hardDay();$("#hardBanner").hidden=!hd;if(hd)$("#hardWhy").textContent="Dia leve ("+hardReason()+"): só o essencial.";
 
     const tl=$("#taskList");tl.innerHTML="";
     if(!inst.length)tl.appendChild(Object.assign(el("div","empty"),{textContent:"Nenhuma tarefa ativa. Ative seus blocos em Ajustes."}));
@@ -963,6 +985,7 @@
   $("#wdBtn").onclick=()=>setWinddown(!winddown);
   $("#addRewardBtn").onclick=addReward;
   $("#addBlockBtn").onclick=()=>editBlock(null);
+  document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{const tb=document.querySelector('.tab[data-tab="'+b.dataset.go+'"]');if(tb)tb.click();});
   $("#hardFull").onclick=async()=>{await dayRef.set({full:true});render();toast("Mostrando a rotina inteira");};
   $("#gratSave").onclick=saveGrat;
   $("#nameSave").onclick=saveName;
@@ -1043,7 +1066,7 @@
     $("#sleepCard").hidden=!today;
     if(today){$("#sleepLine").textContent="Dormiu "+hhmm(today.bed)+" · Acordou "+hhmm(today.wake);$("#sleepDur").textContent=durTxt(today.minutes);
       const g=sleepGoal(),gl=$("#sleepGoal");gl.classList.toggle("late",g.late>15);
-      gl.textContent=g.late>15?("Deitou "+durTxt(g.late)+" depois da meta ("+g.goal+")"):("Dentro da meta ("+g.goal+") ✓");}
+      gl.textContent=g.late>15?("deitou "+durTxt(g.late)+" tarde"):"na meta ✓";}
     const rg=regularity();$("#regRow").hidden=!rg;
     if(rg){$("#regScore").textContent=rg.score+"/100";
       $("#regHint").textContent="Seus horários variam ~"+(rg.sd<60?rg.sd+" min":durTxt(rg.sd))+" de uma noite pra outra. Dormir e acordar sempre no mesmo horário vale tanto quanto dormir bastante.";}
@@ -1162,7 +1185,7 @@
     $("#screenCard").hidden=!screenEvents.length;
     if(screenEvents.length){$("#screenDur").textContent=durTxt(m);$("#screenBar").style.width=Math.min(100,m/lim*100)+"%";
       const n=$("#screenNote");n.classList.toggle("late",m>lim);
-      n.textContent=m>lim?("Passou "+durTxt(m-lim)+" do limite ("+durTxt(lim)+")"):("Limite: "+durTxt(lim)+" · sobram "+durTxt(lim-m));}
+      n.textContent=m>lim?("passou "+durTxt(m-lim)):("sobram "+durTxt(lim-m));}
     $("#screenLimitTxt").textContent=durTxt(lim)+" em redes sociais. Passou disso, o relatório da noite avisa.";
     $("#screenUrls").hidden=!sleepToken;
     if(sleepToken){$("#screenOpenUrl").value=screenUrl("open");$("#screenCloseUrl").value=screenUrl("close");}
