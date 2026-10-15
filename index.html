@@ -382,14 +382,14 @@
         <p class="hint">Um atalho do iPhone lê seu sono no app Saúde toda manhã e manda pra cá. Se você acordar no horário, o bloco <b>Acordar</b> é marcado sozinho. Não compartilhe esse endereço.</p>
       </div>
       <details class="guide"><summary><span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg></span>Como montar o atalho do sono<span class="plus">＋</span></summary>
-        <div class="gc"><ol>
-          <li>App <b>Atalhos → Automação → ＋ → Hora do Dia</b>: 09:00, Diariamente, <b>Executar Imediatamente</b>. Depois <b>Novo Atalho em Branco</b>.</li>
-          <li><b>Buscar Amostras de Saúde</b>: tipo <b>Análise do Sono</b>, Data de Início nos <b>últimos 1 dia</b>, ordenar por <b>Data de Início — Mais Antiga Primeiro</b>, limite <b>1</b>.</li>
-          <li><b>Obter Detalhes das Amostras de Saúde</b> → <b>Data de Início</b>.</li>
-          <li>De novo <b>Buscar Amostras de Saúde</b>: Análise do Sono, últimos 1 dia, ordenar por <b>Data de Término — Mais Recente Primeiro</b>, limite 1.</li>
-          <li><b>Obter Detalhes das Amostras de Saúde</b> → <b>Data de Término</b>.</li>
-          <li><b>Obter Conteúdo do URL</b>: cole seu endereço, Método <b>POST</b>, Corpo <b>JSON</b>. Campo <b>bed</b> = Data de Início e campo <b>wake</b> = Data de Término. Toque em cada data e escolha formato <b>ISO 8601</b>.</li>
-          <li>(Opcional) <b>Mostrar Notificação</b> com o Conteúdo do URL — aparece "Sono registrado: 23:40 → 06:35".</li>
+        <div class="gc">É <b>uma automação só</b>, com duas ações. Copie seu endereço aqui em cima antes.<ol>
+          <li>App <b>Atalhos → Automação → ＋ → Hora do Dia</b>: 10:00, Diariamente, <b>Executar Imediatamente</b> → <b>Novo Atalho em Branco</b>.</li>
+          <li>Busque e toque em <b>Buscar Amostras de Saúde</b>. Tipo: <b>Sono</b> (não "Alteração de sono"). <b>Adicionar Filtro</b>: Data de Início está nos últimos <b>1 dia</b>. Deixe o <b>Limite desligado</b> (cinza).</li>
+          <li>Busque e toque em <b>Obter Conteúdo do URL</b>. Toque em <b>URL</b> e cole seu endereço.</li>
+          <li>Toque na setinha <b>›</b> do lado do endereço. Método: <b>POST</b>. Corpo da Solicitação: <b>JSON</b>.</li>
+          <li>Toque em <b>＋ Adicionar novo campo → Texto</b>. Chave: <b>bed</b>. No Texto, escolha <b>Amostras de Saúde</b> em cima do teclado, toque na bolinha azul e escolha <b>Data de Início</b>.</li>
+          <li>De novo <b>＋ Adicionar novo campo → Texto</b>. Chave: <b>wake</b>. Texto: <b>Amostras de Saúde</b> → <b>Data de Término</b>.</li>
+          <li>Toque em <b>▶️</b> pra testar: deve aparecer <b>"Sono registrado"</b>. Se você costuma acordar depois das 10h, ponha a automação mais tarde.</li>
         </ol></div></details>
 
       <div class="eyebrow">iPhone — reforço (opcional)</div>
