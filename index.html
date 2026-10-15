@@ -363,6 +363,7 @@
         <div class="gc">No Safari: toque em <b>Compartilhar</b> → <b>Adicionar à Tela de Início</b>. Vira um app de verdade.</div></details>
 
       <p class="hint" id="syncNote">Seus dados ficam privados na sua conta e sincronizam entre seus aparelhos.</p>
+      <button class="btn ghost block" id="logoutBtn" hidden style="margin-top:12px">Sair da conta</button>
     </section>
   </main>
 
@@ -380,6 +381,13 @@
   <h2>My <em>Journey</em></h2>
   <p id="gateMsg">Carregando sua jornada…</p>
   <p class="hint" id="gateHint" style="max-width:34ch"></p>
+  <form id="authForm" hidden style="width:100%;max-width:300px;display:flex;flex-direction:column;gap:9px;margin-top:4px">
+    <input type="email" id="authEmail" placeholder="Seu e-mail" autocomplete="email" required>
+    <input type="password" id="authPass" placeholder="Senha (mín. 6 caracteres)" autocomplete="current-password" minlength="6" required>
+    <button class="btn block" id="authSubmit" type="submit" style="margin-top:2px">Entrar</button>
+    <button class="btn ghost block" id="authToggle" type="button" style="margin-top:0">Criar conta nova</button>
+    <div class="hint" id="authMsg" style="margin-top:2px;text-align:center"></div>
+  </form>
   <button class="btn" id="gateRetry" hidden style="margin-top:4px">Tentar de novo</button>
 </div>
 
@@ -674,12 +682,12 @@
   let sb=null,deviceId=null,STORE={app:null,days:{}};
   try{const raw=localStorage.getItem("mjState");if(raw)STORE=JSON.parse(raw);}catch(e){}
   if(!STORE.days)STORE.days={};
-  function persist(){try{localStorage.setItem("mjState",JSON.stringify(STORE));}catch(e){}}
+  function persist(){try{localStorage.setItem("mjState",JSON.stringify(STORE));}catch(e){}saveRemote();}
   function makeDayRef(d){return{set:async(o)=>{STORE.days[d]=o;if(d===dateKey)day=o;persist();},onSnapshot:cb=>{cb({exists:!!STORE.days[d],data:()=>STORE.days[d]});return ()=>{};}};}
   appRef={update:async p=>{Object.assign(app,p);STORE.app=app;persist();syncSchedule();},set:async o=>{app=o;STORE.app=app;persist();syncSchedule();},get:async()=>({exists:!!STORE.app,data:()=>STORE.app}),collection:()=>({doc:d=>makeDayRef(d)})};
   function buildSchedule(){const out=[];((app&&app.blocks)||[]).forEach(b=>{if(!b.enabled)return;(b.times||[]).forEach(t=>out.push({t:t,label:b.label}));});return out;}
   let syncT=null;
-  function syncSchedule(){if(!sb)return;clearTimeout(syncT);syncT=setTimeout(async()=>{try{await sb.from("mj_devices").upsert({id:deviceId,schedule:buildSchedule(),tz:"America/Sao_Paulo",enabled:true,last_seen:new Date().toISOString()});}catch(e){}},900);}
+  function syncSchedule(){if(!sb)return;clearTimeout(syncT);syncT=setTimeout(async()=>{try{await sb.from("mj_devices").upsert({id:deviceId,schedule:buildSchedule(),tz:"America/Sao_Paulo",enabled:true,user_id:(currentUser?currentUser.id:null),last_seen:new Date().toISOString()});}catch(e){}},900);}
   function urlB64(s){const pad="=".repeat((4-s.length%4)%4);const b=(s+pad).replace(/-/g,"+").replace(/_/g,"/");const raw=atob(b);const arr=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)arr[i]=raw.charCodeAt(i);return arr;}
   function updatePushUI(){const b=$("#pushBtn");if(!b)return;const on=("Notification"in window)&&Notification.permission==="granted"&&LS("mj_push")==="1";b.textContent=on?"Notificações ativas ✓":"Ativar notificações";b.classList.toggle("ghost",on);}
   async function enablePush(){
@@ -690,25 +698,68 @@
       const reg=await navigator.serviceWorker.ready;
       let sub=await reg.pushManager.getSubscription();
       if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlB64(VAPID_PUBLIC)});
-      if(sb)await sb.from("mj_devices").upsert({id:deviceId,push:sub.toJSON(),schedule:buildSchedule(),tz:"America/Sao_Paulo",enabled:true,last_seen:new Date().toISOString()});
+      if(sb)await sb.from("mj_devices").upsert({id:deviceId,push:sub.toJSON(),schedule:buildSchedule(),tz:"America/Sao_Paulo",enabled:true,user_id:(currentUser?currentUser.id:null),last_seen:new Date().toISOString()});
       LS("mj_push","1");updatePushUI();toast("Notificações ativadas!");
     }catch(e){toast("Não consegui ativar. Abra pelo ícone da Tela de Início e tente de novo.");}
   }
   document.addEventListener("visibilitychange",()=>{if(document.hidden)return;const t=todayStr();if(t!==dateKey){dateKey=t;dayRef=makeDayRef(dateKey);day=STORE.days[dateKey]||{completed:{},points:0,gratidao:"",mood:0};render();}});
-  function init(){
-    try{deviceId=localStorage.getItem("mjDevice");if(!deviceId){deviceId=(window.crypto&&crypto.randomUUID?crypto.randomUUID():(Date.now()+"-"+Math.random().toString(36).slice(2)));localStorage.setItem("mjDevice",deviceId);}}catch(e){deviceId="dev-"+Date.now();}
-    try{if(window.supabase&&window.supabase.createClient)sb=window.supabase.createClient(SB_URL,SB_KEY);}catch(e){}
+  let currentUser=null,saveT=null,authMode="login";
+  function saveRemote(){if(!sb||!currentUser)return;clearTimeout(saveT);saveT=setTimeout(async()=>{try{await sb.from("mj_state").upsert({user_id:currentUser.id,data:STORE,updated_at:new Date().toISOString()});}catch(e){}},1000);}
+  function initApp(){
     app=STORE.app||defaultApp();app.blocks=app.blocks||[];app.rewards=app.rewards||[];
     if(typeof app.weekendFlex==="boolean")weekendFlex=app.weekendFlex;
-    STORE.app=app;persist();
+    STORE.app=app;try{localStorage.setItem("mjState",JSON.stringify(STORE));}catch(e){}
     dayRef=makeDayRef(dateKey);day=STORE.days[dateKey]||{completed:{},points:0,gratidao:"",mood:0};
     try{setWinddown(LS("mj_wd")==="1");}catch(e){}
     showApp();render();
     const pb=$("#pushBtn");if(pb)pb.onclick=enablePush;updatePushUI();
-    syncSchedule();
+    const lo=$("#logoutBtn");if(lo){lo.hidden=!(sb&&currentUser);lo.onclick=async()=>{try{await sb.auth.signOut();}catch(e){}};}
+    syncSchedule();saveRemote();
+  }
+  function showLogin(msg){$("#gate").hidden=false;$("#app").hidden=true;$("#gateRetry").hidden=true;
+    $("#gateMsg").textContent="Entre pra continuar";$("#gateHint").textContent="Seu progresso fica guardado e sincroniza entre seus aparelhos.";
+    $("#authForm").hidden=false;$("#authMsg").textContent=msg||"";}
+  function wireAuth(){
+    const f=$("#authForm");if(!f)return;
+    $("#authToggle").onclick=()=>{authMode=authMode==="login"?"signup":"login";
+      $("#authSubmit").textContent=authMode==="login"?"Entrar":"Criar conta";
+      $("#authToggle").textContent=authMode==="login"?"Criar conta nova":"Já tenho conta";
+      $("#authPass").setAttribute("autocomplete",authMode==="login"?"current-password":"new-password");$("#authMsg").textContent="";};
+    f.onsubmit=async(e)=>{e.preventDefault();if(!sb){$("#authMsg").textContent="Sem conexão com o servidor.";return;}
+      const email=($("#authEmail").value||"").trim();const pass=$("#authPass").value||"";
+      if(!email||pass.length<6){$("#authMsg").textContent="Informe e-mail e senha (mín. 6).";return;}
+      $("#authSubmit").disabled=true;$("#authMsg").textContent="Um instante…";
+      try{
+        let res;
+        if(authMode==="signup"){res=await sb.auth.signUp({email:email,password:pass});if(res.error)throw res.error;
+          if(!res.data.session){res=await sb.auth.signInWithPassword({email:email,password:pass});if(res.error)throw res.error;}}
+        else{res=await sb.auth.signInWithPassword({email:email,password:pass});if(res.error)throw res.error;}
+        await afterLogin((res.data&&(res.data.user||(res.data.session&&res.data.session.user))));
+      }catch(err){const m=((err&&err.message)||"").toLowerCase();
+        $("#authMsg").textContent = m.indexOf("confirm")>=0?"Confirme seu e-mail (veja a caixa de entrada), ou me avise pra eu liberar."
+          :m.indexOf("invalid")>=0?"E-mail ou senha incorretos."
+          :(m.indexOf("already")>=0||m.indexOf("registered")>=0)?"Esse e-mail já tem conta — toque em Entrar."
+          :((err&&err.message)||"Não consegui entrar. Tente de novo.");
+      }finally{$("#authSubmit").disabled=false;}
+    };
+  }
+  async function afterLogin(user){
+    if(!user)return;currentUser=user;$("#authForm").hidden=true;
+    try{const r=await sb.from("mj_state").select("data").eq("user_id",user.id).maybeSingle();
+      const d=r&&r.data&&r.data.data;if(d&&(d.app||d.days))STORE={app:d.app||null,days:d.days||{}};}catch(e){}
+    if(!STORE.days)STORE.days={};
+    initApp();
+  }
+  async function boot(){
+    try{deviceId=localStorage.getItem("mjDevice");if(!deviceId){deviceId=(window.crypto&&crypto.randomUUID?crypto.randomUUID():(Date.now()+"-"+Math.random().toString(36).slice(2)));localStorage.setItem("mjDevice",deviceId);}}catch(e){deviceId="dev-"+Date.now();}
+    try{if(window.supabase&&window.supabase.createClient)sb=window.supabase.createClient(SB_URL,SB_KEY);}catch(e){}
+    wireAuth();
+    if(!sb){initApp();return;}
+    try{const s=await sb.auth.getSession();if(s&&s.data&&s.data.session){await afterLogin(s.data.session.user);}else{showLogin();}}catch(e){showLogin();}
+    try{sb.auth.onAuthStateChange((_e,s)=>{if(!s){currentUser=null;showLogin("Você saiu. Entre de novo quando quiser.");}});}catch(e){}
   }
   if("serviceWorker"in navigator){navigator.serviceWorker.register("sw.js").catch(()=>{});}
-  init();
+  boot();
 })();
 </script>
 </body></html>
