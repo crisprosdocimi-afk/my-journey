@@ -252,6 +252,21 @@
   .sect-body details.guide{box-shadow:none;background:var(--card-soft)}
   .sect-body .rowcard.sub{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}
   .sub-k{text-transform:uppercase;letter-spacing:.12em;font-size:10.5px;font-weight:700;color:var(--faint);margin:18px 0 4px}
+  /* ---- Palavra do dia (destaque no topo de Hoje e na Fé) ---- */
+  .word{position:relative;padding:18px 18px 16px;border-radius:var(--r);border:1px solid var(--line-2);
+    background:radial-gradient(120% 90% at 0% 0%,var(--accent-soft),transparent 60%),linear-gradient(160deg,var(--card),var(--card-soft));box-shadow:var(--shadow)}
+  .word-k{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+  .word-ref{color:var(--muted);letter-spacing:.06em}
+  .word-key{font-family:var(--display);font-size:22px;line-height:1.38;font-weight:500;margin-top:10px;text-wrap:pretty}
+  .word-key::before{content:"“";color:var(--accent)}.word-key::after{content:"”";color:var(--accent)}
+  .word-psg{margin-top:12px;font-family:var(--display);font-size:15px;line-height:1.65;color:var(--muted);
+    max-height:5.1em;overflow:hidden;-webkit-mask-image:linear-gradient(#000 45%,transparent);mask-image:linear-gradient(#000 45%,transparent)}
+  .word-psg:empty{display:none}
+  .word.open .word-psg{max-height:none;-webkit-mask-image:none;mask-image:none}
+  .word-psg sup{font-family:var(--ui);font-size:9.5px;color:var(--faint);margin-right:3px;font-weight:700}
+  .word-psg .key{color:var(--fg)}
+  .word-more{margin-top:8px}
+  #v-hoje .word+.hero{margin-top:12px}
   /* ---- Hoje compacto ---- */
   .chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:10px}
   .chips:not(:has(.chip:not([hidden]))){display:none}
@@ -341,6 +356,9 @@
 
   <main>
     <section class="view active" id="v-hoje">
+      <!-- Palavra do dia em primeiro: versículo em destaque + trecho (Almeida, domínio público) -->
+      <div class="word" id="wordHoje"><div class="word-k">Palavra de hoje<span class="word-ref"></span></div><div class="word-key"></div>
+        <div class="word-psg"></div><button class="linkbtn word-more" hidden>Ler o trecho todo</button></div>
       <div class="hero">
         <div class="ring">
           <svg viewBox="0 0 96 96"><circle class="trk" cx="48" cy="48" r="40"/><circle class="prg" id="ringPrg" cx="48" cy="48" r="40"/></svg>
@@ -370,8 +388,6 @@
       <div class="moodrow"><span class="mood-q">Humor</span><div class="mood-opts" id="moodOpts"></div><span class="mood-label" id="moodLabel"></span></div>
       <div class="eyebrow">Hoje</div>
       <div class="tasks" id="taskList"></div>
-      <div class="eyebrow">Palavra de hoje</div>
-      <div class="verse-mini"><div class="verse" id="verseTextHoje"></div><div class="verse-ref" id="verseRefHoje"></div></div>
     </section>
 
     <section class="view" id="v-jornada">
@@ -409,7 +425,8 @@
 
     <section class="view" id="v-fe">
       <div class="eyebrow">Palavra de hoje</div>
-      <div class="card verse-card"><div class="quote">”</div><div class="verse" id="verseText"></div><div class="verse-ref" id="verseRef"></div></div>
+      <div class="word open" id="wordFe"><div class="word-k">Palavra de hoje<span class="word-ref"></span></div><div class="word-key"></div>
+        <div class="word-psg"></div><button class="linkbtn word-more" hidden>Ler o trecho todo</button></div>
       <div class="eyebrow">Gratidão de hoje</div>
       <div class="card">
         <label class="fld" for="gratInput">Pelo que você é grato hoje? Três coisinhas já bastam.</label>
@@ -677,6 +694,15 @@
   const PHRASES=["Um passo de cada vez já é caminhar.","Você apareceu. Isso muda tudo.","O difícil de hoje é o orgulho de amanhã.","Progresso vale mais que perfeição.","Pequeno e feito vence grande e sonhado.","Você é mais forte do que a vontade de desistir.","Cada sim pra você constrói a sua vida.","Disciplina é amor-próprio em ação.","O seu futuro agradece por agora.","Levantar e tentar já é coragem.","Mais um tijolo da sua jornada.","Você não precisa estar 100% pra dar o próximo passo.","Constância cansa menos que recomeçar.","O sonho se constrói nos dias comuns.","Feito. Respira e sente o orgulho.","Você está voltando pra linha — e isso importa.","Hoje você escolheu você.","A vitória de agora acende a próxima.","Seu eu de amanhã começou aqui.","Devagar também é na direção certa.","Nenhum esforço seu se perde.","Você plantou algo bom agora.","Orgulho de ver você insistindo.","Uma tarefa de cada vez, um dia de cada vez.","A rotina te carrega quando a vontade falta.","Isso. Continua, no seu ritmo.","Força não é não cair; é levantar de novo.","Você está exatamente onde precisa começar.","Pequenas vitórias viram grandes viradas.","Respeita teu esforço: ele é real.","Deus caminha com quem dá o primeiro passo.","Fé e ação, de mãos dadas.","Hoje você honrou a sua palavra.","Teu futuro é feito de agoras como esse.","Menos culpa, mais próximo passo.","Você merece o que está construindo.","Seguir imperfeito é melhor que parar perfeito.","Tá difícil, e mesmo assim você fez.","Cada ligação é uma porta. Boa!","Teu esforço silencioso vai fazer barulho."];
   const VERSES=[["Posso todas as coisas naquele que me fortalece.","Filipenses 4:13"],["Entrega o teu caminho ao Senhor; confia nele, e ele tudo fará.","Salmos 37:5"],["Não temas, porque eu sou contigo; não te assombres, porque eu sou o teu Deus.","Isaías 41:10"],["O Senhor é o meu pastor; nada me faltará.","Salmos 23:1"],["Tudo tem o seu tempo determinado debaixo do céu.","Eclesiastes 3:1"],["Aquietai-vos e sabei que eu sou Deus.","Salmos 46:10"],["O choro pode durar uma noite, mas a alegria vem pela manhã.","Salmos 30:5"],["Lançando sobre ele toda a vossa ansiedade, porque ele tem cuidado de vós.","1 Pedro 5:7"],["Os que esperam no Senhor renovarão as suas forças.","Isaías 40:31"],["Seja forte e corajoso; o Senhor, teu Deus, é contigo por onde quer que andares.","Josué 1:9"],["Bem-aventurado o homem que confia no Senhor.","Jeremias 17:7"],["O Senhor pelejará por vós, e vós vos calareis.","Êxodo 14:14"],["Em paz me deitarei e dormirei, porque só tu me fazes repousar seguro.","Salmos 4:8"],["Confia no Senhor de todo o teu coração.","Provérbios 3:5"],["A minha graça te basta, porque o meu poder se aperfeiçoa na fraqueza.","2 Coríntios 12:9"],["Tudo é possível ao que crê.","Marcos 9:23"],["Alegrai-vos na esperança, sede pacientes na tribulação.","Romanos 12:12"],["Buscai primeiro o reino de Deus, e tudo vos será acrescentado.","Mateus 6:33"],["O justo cai sete vezes, e se levanta.","Provérbios 24:16"],["Não se turbe o vosso coração; credes em Deus, crede também em mim.","João 14:1"],["O Senhor é a minha luz e a minha salvação; a quem temerei?","Salmos 27:1"],["Vinde a mim, todos os que estais cansados, e eu vos aliviarei.","Mateus 11:28"],["Fiel é aquele que vos chama, o qual também o fará.","1 Tessalonicenses 5:24"],["Esforçai-vos, e ele fortalecerá o vosso coração.","Salmos 31:24"]];
 
+  // trecho de cada dia, na mesma ordem de VERSES: [referência, livro (código), capítulo, do versículo, até, versículo-chave]
+  // texto vem da Almeida (domínio público) em bible-api.com; sem internet, mostra só o versículo curto de VERSES
+  const PASSAGES=[["Filipenses 4:4-13","PHP",4,4,13,13],["Salmos 37:3-7","PSA",37,3,7,5],["Isaías 41:8-13","ISA",41,8,13,10],["Salmos 23","PSA",23,1,6,1],
+    ["Eclesiastes 3:1-8","ECC",3,1,8,1],["Salmos 46","PSA",46,1,11,10],["Salmos 30:1-5","PSA",30,1,5,5],["1 Pedro 5:6-10","1PE",5,6,10,7],
+    ["Isaías 40:28-31","ISA",40,28,31,31],["Josué 1:5-9","JOS",1,5,9,9],["Jeremias 17:7-8","JER",17,7,8,7],["Êxodo 14:13-14","EXO",14,13,14,14],
+    ["Salmos 4:6-8","PSA",4,6,8,8],["Provérbios 3:5-8","PRO",3,5,8,5],["2 Coríntios 12:7-10","2CO",12,7,10,9],["Marcos 9:21-24","MRK",9,21,24,23],
+    ["Romanos 12:9-13","ROM",12,9,13,12],["Mateus 6:25-34","MAT",6,25,34,33],["Provérbios 24:15-16","PRO",24,15,16,16],["João 14:1-6","JHN",14,1,6,1],
+    ["Salmos 27:1-5","PSA",27,1,5,1],["Mateus 11:28-30","MAT",11,28,30,28],["1 Tessalonicenses 5:16-24","1TH",5,16,24,24],["Salmos 31:19-24","PSA",31,19,24,24]];
+  let passage=null,passageIdx=-1,passageLoading=false;
   let db=null,uid=null,appRef=null,dayRef=null,unsubApp=null,unsubDay=null;
   let app=null,day=null,dateKey=todayStr(),weekendFlex=true,winddown=false,writing=false;
   const RC=2*Math.PI*40;
@@ -730,10 +756,7 @@
     if(!pr.length)pl.appendChild(Object.assign(el("div","empty"),{textContent:"Ative o bloco Orar em Ajustes."}));
     pr.forEach(x=>pl.appendChild(taskRow(x)));
 
-    const vi=dayIndex()%VERSES.length;
-    $("#verseText").textContent=VERSES[vi][0];
-    $("#verseRef").textContent=VERSES[vi][1];
-    if($("#verseTextHoje")){$("#verseTextHoje").textContent=VERSES[vi][0];$("#verseRefHoje").textContent=VERSES[vi][1];}
+    renderWord();
     $("#gratInput").value=(day&&day.gratidao)||"";
 
     renderRewards();renderBlockEditor();renderMood();renderJornada();renderSleep();renderSpecials();renderGratitude();renderScreen();renderReport();
@@ -778,6 +801,27 @@
       const tg=el("div","toggle"+(b.enabled?" on":""));tg.onclick=()=>{b.enabled=!b.enabled;saveApp({blocks:app.blocks});render();};
       row.appendChild(tg);be.appendChild(row);
     });
+  }
+  // ---- Palavra do dia: busca o trecho uma vez (fica guardado no aparelho) e desenha nos dois cartões ----
+  async function loadPassage(i){
+    const ck="mj_psg_"+i;try{const c=JSON.parse(LS(ck)||"null");if(c&&c.length){passage=c;passageIdx=i;return;}}catch(e){}
+    if(passageLoading)return;passageLoading=true;
+    try{const p=PASSAGES[i];const r=await fetch("https://bible-api.com/data/almeida/"+p[1]+"/"+p[2]);const j=await r.json();
+      const vs=(j.verses||[]).filter(v=>v.verse>=p[3]&&v.verse<=p[4]).map(v=>({n:v.verse,t:String(v.text).trim()}));
+      if(vs.length){passage=vs;passageIdx=i;LS(ck,JSON.stringify(vs));renderWord();}
+    }catch(e){}finally{passageLoading=false;}
+  }
+  function renderWord(){
+    const i=dayIndex()%PASSAGES.length,p=PASSAGES[i];
+    if(passageIdx!==i){passage=null;loadPassage(i);}
+    const key=passage&&passage.find(v=>v.n===p[5]);
+    ["#wordHoje","#wordFe"].forEach(sel=>{const w=$(sel);if(!w)return;
+      w.querySelector(".word-ref").textContent=" · "+p[0];
+      w.querySelector(".word-key").textContent=key?key.t:VERSES[i][0];
+      const ps=w.querySelector(".word-psg");ps.innerHTML="";
+      (passage||[]).forEach(v=>{const s=el("span","wv"+(v.n===p[5]?" key":""));s.innerHTML="<sup>"+v.n+"</sup>";s.appendChild(document.createTextNode(v.t+" "));ps.appendChild(s);});
+      const more=w.querySelector(".word-more");more.hidden=!passage||w.classList.contains("open");
+      more.onclick=()=>{w.classList.add("open");more.hidden=true;};});
   }
   function dayIndex(){const d=new Date();return Math.floor(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5);}
 
