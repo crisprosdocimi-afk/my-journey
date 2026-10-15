@@ -236,6 +236,15 @@
   .modal .form-row{text-align:left;margin-top:15px}
   .modal .actions{display:flex;gap:10px;margin-top:20px}
   .modal .actions .btn{flex:1}
+  .sleepcard{display:flex;align-items:center;gap:13px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);padding:12px 15px;margin-top:12px;box-shadow:var(--shadow-sm)}
+  .sleepcard .mid{flex:1;min-width:0}
+  .sl-k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+  .sl-v{font-size:14px;font-weight:600;margin-top:2px;font-variant-numeric:tabular-nums}
+  .sl-dur{font-family:var(--display);font-size:20px;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums}
+  .sleepbars{display:flex;align-items:flex-end;gap:5px;height:90px}
+  .sleepbars .sb{flex:1;border-radius:5px 5px 2px 2px;background:var(--accent);min-height:3px}
+  .sleepbars .sb.none{background:var(--card-soft);border:1px solid var(--line);height:3px}
+  .sleepbars .sb.short{background:var(--accent-2);opacity:.55}
   .icgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:7px}
   .icpick{aspect-ratio:1;border-radius:11px;border:1px solid var(--line-2);background:var(--card-soft);color:var(--muted);
     cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
@@ -282,6 +291,11 @@
           </div>
         </div>
       </div>
+      <div class="sleepcard" id="sleepCard" hidden>
+        <span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg></span>
+        <div class="mid"><div class="sl-k">Sua noite</div><div class="sl-v" id="sleepLine"></div></div>
+        <div class="sl-dur" id="sleepDur"></div>
+      </div>
       <div class="cheer" id="cheer" hidden><svg class="i" viewBox="0 0 24 24"><path d="M12 3l1.9 3.9 4.3.6-3.1 3 .7 4.3L12 16.8 8.2 14.8l.7-4.3-3.1-3 4.3-.6L12 3Z"/></svg>Você apareceu hoje. Isso já é vitória.</div>
       <div class="mood">
         <div class="mood-top"><span>Como você está hoje?</span><span class="mood-label" id="moodLabel"></span></div>
@@ -308,6 +322,10 @@
       <div class="card"><div class="heat" id="heat"></div><div class="heat-leg"><span>menos</span><i></i><i></i><i></i><i></i><span>mais</span></div></div>
       <div class="eyebrow">Seu humor (14 dias)</div>
       <div class="card"><div class="moodtrend" id="moodTrend"></div></div>
+      <div id="sleepSec" hidden>
+        <div class="eyebrow">Seu sono (14 dias)</div>
+        <div class="card"><div class="sleepbars" id="sleepBars"></div><div class="lvl-next" id="sleepAvg"></div></div>
+      </div>
       <div class="eyebrow">Conquistas</div>
       <div class="badges" id="badges"></div>
     </section>
@@ -353,6 +371,26 @@
         <button class="btn block" id="pushBtn" style="margin-top:0">Ativar notificações</button>
         <p class="hint">Primeiro <b>Adicione à Tela de Início</b> e abra pelo ícone. Depois toque aqui e <b>permita</b> — aí os lembretes da sua rotina chegam sozinhos, mesmo com o celular trancado.</p>
       </div>
+
+      <div class="eyebrow">Sono — app Saúde do iPhone</div>
+      <div class="card">
+        <div id="sleepTokenBox" hidden>
+          <label class="fld" for="sleepUrl">Seu endereço pessoal (vai dentro do atalho)</label>
+          <div class="rowcard" style="margin-top:0"><input type="text" id="sleepUrl" readonly><button class="btn sm" id="sleepCopy">Copiar</button></div>
+        </div>
+        <button class="btn block" id="sleepGen" style="margin-top:0">Gerar meu código</button>
+        <p class="hint">Um atalho do iPhone lê seu sono no app Saúde toda manhã e manda pra cá. Se você acordar no horário, o bloco <b>Acordar</b> é marcado sozinho. Não compartilhe esse endereço.</p>
+      </div>
+      <details class="guide"><summary><span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg></span>Como montar o atalho do sono<span class="plus">＋</span></summary>
+        <div class="gc"><ol>
+          <li>App <b>Atalhos → Automação → ＋ → Hora do Dia</b>: 09:00, Diariamente, <b>Executar Imediatamente</b>. Depois <b>Novo Atalho em Branco</b>.</li>
+          <li><b>Buscar Amostras de Saúde</b>: tipo <b>Análise do Sono</b>, Data de Início nos <b>últimos 1 dia</b>, ordenar por <b>Data de Início — Mais Antiga Primeiro</b>, limite <b>1</b>.</li>
+          <li><b>Obter Detalhes das Amostras de Saúde</b> → <b>Data de Início</b>.</li>
+          <li>De novo <b>Buscar Amostras de Saúde</b>: Análise do Sono, últimos 1 dia, ordenar por <b>Data de Término — Mais Recente Primeiro</b>, limite 1.</li>
+          <li><b>Obter Detalhes das Amostras de Saúde</b> → <b>Data de Término</b>.</li>
+          <li><b>Obter Conteúdo do URL</b>: cole seu endereço, Método <b>POST</b>, Corpo <b>JSON</b>. Campo <b>bed</b> = Data de Início e campo <b>wake</b> = Data de Término. Toque em cada data e escolha formato <b>ISO 8601</b>.</li>
+          <li>(Opcional) <b>Mostrar Notificação</b> com o Conteúdo do URL — aparece "Sono registrado: 23:40 → 06:35".</li>
+        </ol></div></details>
 
       <div class="eyebrow">iPhone — reforço (opcional)</div>
       <details class="guide"><summary><span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 1.5M9 2h6M12 5V2"/></svg></span>Alarmes que te acordam e lembram<span class="plus">＋</span></summary>
@@ -507,7 +545,7 @@
     if($("#verseTextHoje")){$("#verseTextHoje").textContent=VERSES[vi][0];$("#verseRefHoje").textContent=VERSES[vi][1];}
     $("#gratInput").value=(day&&day.gratidao)||"";
 
-    renderRewards();renderBlockEditor();renderMood();renderJornada();
+    renderRewards();renderBlockEditor();renderMood();renderJornada();renderSleep();
     $("#weekendToggle").classList.toggle("on",weekendFlex);
   }
   function taskRow(x){
@@ -601,7 +639,7 @@
       card.innerHTML='<div class="bi">'+svg("star")+'</div><div class="bn"></div><div class="bd"></div>';
       card.querySelector(".bn").textContent=b.nm;card.querySelector(".bd").textContent=b.dc;bc.appendChild(card);});}
 
-  async function toggle(x){
+  async function toggle(x,quiet){
     if(writing)return;writing=true;
     try{
       day=day||{completed:{},points:0,gratidao:"",mood:0};day.completed=day.completed||{};
@@ -631,7 +669,7 @@
       render();
       await dayRef.set({completed:day.completed,points:day.points,gratidao:day.gratidao||"",mood:day.mood||0});
       await appRef.update({totalPoints:app.totalPoints,xp:app.xp||0,streak:app.streak||0,bestStreak:app.bestStreak||0,shields:app.shields||0,lastActiveDate:app.lastActiveDate||dateKey,history:app.history||{},badges:app.badges||{}});
-      if(nowDone){
+      if(nowDone&&!quiet){
         const inst2=instances();const d2=inst2.filter(y=>isDone(y.iid)).length;
         if(inst2.length&&d2===inst2.length){confetti();celebrateDay();}
         else motivate(x);
@@ -733,7 +771,58 @@
       LS("mj_push","1");updatePushUI();toast("Notificações ativadas!");
     }catch(e){toast("Não consegui ativar. Abra pelo ícone da Tela de Início e tente de novo.");}
   }
-  document.addEventListener("visibilitychange",()=>{if(document.hidden)return;const t=todayStr();if(t!==dateKey){dateKey=t;dayRef=makeDayRef(dateKey);day=STORE.days[dateKey]||{completed:{},points:0,gratidao:"",mood:0};render();}});
+  document.addEventListener("visibilitychange",()=>{if(document.hidden)return;const t=todayStr();if(t!==dateKey){dateKey=t;dayRef=makeDayRef(dateKey);day=STORE.days[dateKey]||{completed:{},points:0,gratidao:"",mood:0};render();}loadSleep();});
+
+  // ---- sono: vem do app Saúde via Atalhos (Edge Function mj-sleep grava em mj_sleep) ----
+  let sleepRows=[],sleepToken=null;
+  const hhmm=iso=>{const d=new Date(iso);return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");};
+  const durTxt=m=>Math.floor(m/60)+"h"+String(m%60).padStart(2,"0");
+  const sleepUrl=()=>SB_URL+"/functions/v1/mj-sleep?t="+sleepToken;
+  async function loadSleep(){
+    if(!sb||!currentUser)return;
+    try{
+      const since=todayStr(new Date(Date.now()-13*864e5));
+      const [r,t]=await Promise.all([
+        sb.from("mj_sleep").select("night,bed,wake,minutes").gte("night",since).order("night"),
+        sb.from("mj_tokens").select("token").maybeSingle()]);
+      sleepRows=(r&&r.data)||[];sleepToken=(t&&t.data&&t.data.token)||null;
+      renderSleep();autoWake();
+    }catch(e){}
+  }
+  function renderSleep(){
+    const today=sleepRows.find(s=>s.night===dateKey);
+    $("#sleepCard").hidden=!today;
+    if(today){$("#sleepLine").textContent="Dormiu "+hhmm(today.bed)+" · Acordou "+hhmm(today.wake);$("#sleepDur").textContent=durTxt(today.minutes);}
+    $("#sleepSec").hidden=!sleepRows.length;
+    if(sleepRows.length){
+      const bars=$("#sleepBars");bars.innerHTML="";const by={};sleepRows.forEach(s=>by[s.night]=s);
+      for(let i=13;i>=0;i--){const d=todayStr(new Date(Date.now()-i*864e5));const s=by[d];const b=el("div","sb");
+        if(!s)b.classList.add("none");else{b.style.height=Math.min(100,s.minutes/600*100)+"%";if(s.minutes<360)b.classList.add("short");b.title=d+" · "+durTxt(s.minutes);}
+        bars.appendChild(b);}
+      const avg=Math.round(sleepRows.reduce((a,s)=>a+s.minutes,0)/sleepRows.length);
+      $("#sleepAvg").textContent="Média de "+durTxt(avg)+" por noite · "+sleepRows.length+" noite"+(sleepRows.length>1?"s":"")+" registrada"+(sleepRows.length>1?"s":"");
+    }
+    $("#sleepTokenBox").hidden=!sleepToken;
+    if(sleepToken)$("#sleepUrl").value=sleepUrl();
+    $("#sleepGen").textContent=sleepToken?"Gerar código novo (invalida o antigo)":"Gerar meu código";
+    $("#sleepGen").classList.toggle("ghost",!!sleepToken);
+  }
+  // acordou até 30 min depois do primeiro horário de Acordar → marca sozinho
+  function autoWake(){
+    const s=sleepRows.find(r=>r.night===dateKey);if(!s)return;
+    const x=instances().find(i=>i.b.id==="acordar");if(!x||isDone(x.iid))return;
+    const ref=x.time||(x.b.times||[])[0];if(!ref)return;
+    const [h,m]=ref.split(":").map(Number);const w=new Date(s.wake);
+    if(w.getHours()*60+w.getMinutes()<=h*60+m+30){toggle(x,true).then(()=>toast("Acordar marcado pelo seu sono"));}
+  }
+  async function genSleepToken(){
+    if(!sb||!currentUser){toast("Entre na sua conta primeiro.");return;}
+    const a=new Uint8Array(24);crypto.getRandomValues(a);const tk=Array.from(a,b=>b.toString(16).padStart(2,"0")).join("");
+    try{const r=await sb.from("mj_tokens").upsert({user_id:currentUser.id,token:tk});if(r.error)throw r.error;
+      sleepToken=tk;renderSleep();toast("Código gerado — copie e cole no atalho");}catch(e){toast("Não consegui gerar. Tenta de novo.");}
+  }
+  $("#sleepGen").onclick=genSleepToken;
+  $("#sleepCopy").onclick=async()=>{try{await navigator.clipboard.writeText(sleepUrl());toast("Copiado");}catch(e){$("#sleepUrl").select();toast("Segure e copie o endereço");}};
   let currentUser=null,saveT=null,authMode="login";
   function saveRemote(){if(!sb||!currentUser)return;clearTimeout(saveT);saveT=setTimeout(async()=>{try{await sb.from("mj_state").upsert({user_id:currentUser.id,data:STORE,updated_at:new Date().toISOString()});}catch(e){}},1000);}
   function initApp(){
@@ -745,7 +834,7 @@
     showApp();render();
     const pb=$("#pushBtn");if(pb)pb.onclick=enablePush;updatePushUI();
     const lo=$("#logoutBtn");if(lo){lo.hidden=!(sb&&currentUser);lo.onclick=async()=>{try{await sb.auth.signOut();}catch(e){}};}
-    syncSchedule();saveRemote();
+    syncSchedule();saveRemote();loadSleep();
   }
   function showLogin(msg){$("#gate").hidden=false;$("#app").hidden=true;$("#gateRetry").hidden=true;
     $("#gateMsg").textContent="Entre pra continuar";$("#gateHint").textContent="Seu progresso fica guardado e sincroniza entre seus aparelhos.";
