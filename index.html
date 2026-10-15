@@ -881,9 +881,10 @@
   function renderGratitude(){
     const s=gratStreak();$("#gratStreak").textContent=s?(s+(s>1?" dias seguidos agradecendo":" dia agradecendo")):"Comece hoje sua sequência de gratidão";
     const list=$("#gratList");list.innerHTML="";
-    const ds=Object.keys(STORE.days).filter(d=>d!==dateKey&&gratOf(d)).sort().reverse().slice(0,60);
-    if(!ds.length){list.appendChild(Object.assign(el("div","empty"),{textContent:"Suas gratidões dos outros dias aparecem aqui."}));return;}
-    ds.forEach(d=>{const it=el("div","grat-it");it.appendChild(Object.assign(el("div","grat-d"),{textContent:fmtDay(d)}));
+    // inclui hoje (no topo): gratidão que chega pela Siri tem que aparecer aqui também
+    const ds=Object.keys(STORE.days).filter(d=>gratOf(d)).sort().reverse().slice(0,60);
+    if(!ds.length){list.appendChild(Object.assign(el("div","empty"),{textContent:"Suas gratidões aparecem aqui."}));return;}
+    ds.forEach(d=>{const it=el("div","grat-it");it.appendChild(Object.assign(el("div","grat-d"),{textContent:d===dateKey?"Hoje":fmtDay(d)}));
       it.appendChild(Object.assign(el("div","grat-t"),{textContent:gratOf(d)}));list.appendChild(it);});
   }
 
