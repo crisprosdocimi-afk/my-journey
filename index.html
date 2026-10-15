@@ -246,6 +246,24 @@
   .sleepbars .sb{flex:1;border-radius:5px 5px 2px 2px;background:var(--accent);min-height:3px}
   .sleepbars .sb.none{background:var(--card-soft);border:1px solid var(--line);height:3px}
   .sleepbars .sb.short{background:var(--accent-2);opacity:.55}
+  .sl-goal{font-size:12px;color:var(--muted);margin-top:2px}
+  .sl-goal.late{color:#f0a15f}
+  .regrow{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
+  .regrow b{font-family:var(--display);font-size:24px;color:var(--accent);font-variant-numeric:tabular-nums}
+  .regrow span{font-size:12px;color:var(--muted)}
+  .grat-streak{display:flex;align-items:center;gap:8px;margin-top:12px;color:var(--accent);font-size:13px;font-weight:600}
+  .grat-streak .i{width:16px;height:16px}
+  .grat-it{padding:12px 0;border-bottom:1px solid var(--line)}
+  .grat-it:first-child{padding-top:2px}.grat-it:last-child{border-bottom:none;padding-bottom:2px}
+  .grat-d{font-size:11px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+  .grat-t{font-size:14.5px;margin-top:4px;white-space:pre-wrap;line-height:1.5}
+  .report{--rc:#e0c06a}.report.verde{--rc:#6fc79b}.report.vermelho{--rc:#e06a6a}
+  .report{border-color:color-mix(in srgb,var(--rc) 35%,transparent);background:linear-gradient(160deg,color-mix(in srgb,var(--rc) 10%,var(--card)),var(--card-soft))}
+  .rp-top{display:flex;align-items:center;gap:12px}
+  .rp-dot{width:14px;height:14px;border-radius:50%;background:var(--rc);box-shadow:0 0 14px var(--rc);flex:none}
+  .rp-k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+  .rp-t{font-family:var(--display);font-size:20px;font-weight:600;margin-top:1px}
+  .rp-lines{margin-top:10px;color:var(--muted);font-size:13.5px;line-height:1.7}
   .icgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:7px}
   .icpick{aspect-ratio:1;border-radius:11px;border:1px solid var(--line-2);background:var(--card-soft);color:var(--muted);
     cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
@@ -294,7 +312,7 @@
       </div>
       <div class="sleepcard" id="sleepCard" hidden>
         <span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg></span>
-        <div class="mid"><div class="sl-k">Sua noite</div><div class="sl-v" id="sleepLine"></div></div>
+        <div class="mid"><div class="sl-k">Sua noite</div><div class="sl-v" id="sleepLine"></div><div class="sl-goal" id="sleepGoal"></div></div>
         <div class="sl-dur" id="sleepDur"></div>
       </div>
       <div class="cheer" id="cheer" hidden><svg class="i" viewBox="0 0 24 24"><path d="M12 3l1.9 3.9 4.3.6-3.1 3 .7 4.3L12 16.8 8.2 14.8l.7-4.3-3.1-3 4.3-.6L12 3Z"/></svg>Você apareceu hoje. Isso já é vitória.</div>
@@ -309,6 +327,8 @@
     </section>
 
     <section class="view" id="v-jornada">
+      <div class="card report" id="reportCard"><div class="rp-top"><span class="rp-dot"></span><div><div class="rp-k">Seu dia até agora</div><div class="rp-t" id="reportTitle"></div></div></div><div class="rp-lines" id="reportLines"></div></div>
+      <div style="height:12px"></div>
       <div class="card levelcard">
         <div class="lvl-top"><div><div class="lvl-n" id="lvlN">Nível 1</div><div class="lvl-t" id="lvlT">Primeiro passo</div></div><div class="lvl-xp" id="lvlXP">0 XP</div></div>
         <div class="bar"><span id="lvlBar" style="width:0%"></span></div>
@@ -325,7 +345,7 @@
       <div class="card"><div class="moodtrend" id="moodTrend"></div></div>
       <div id="sleepSec" hidden>
         <div class="eyebrow">Seu sono (14 dias)</div>
-        <div class="card"><div class="sleepbars" id="sleepBars"></div><div class="lvl-next" id="sleepAvg"></div></div>
+        <div class="card"><div class="regrow" id="regRow" hidden><span>Regularidade (7 noites)</span><b id="regScore"></b></div><div class="sleepbars" id="sleepBars"></div><div class="lvl-next" id="sleepAvg"></div><div class="lvl-next" id="regHint"></div></div>
       </div>
       <div class="eyebrow">Conquistas</div>
       <div class="badges" id="badges"></div>
@@ -347,7 +367,10 @@
         <label class="fld" for="gratInput">Pelo que você é grato hoje? Três coisinhas já bastam.</label>
         <textarea id="gratInput" rows="3" placeholder="Hoje eu sou grato por…"></textarea>
         <button class="btn sm block" id="gratSave">Guardar gratidão</button>
+        <div class="grat-streak"><svg class="i" viewBox="0 0 24 24"><path d="M12 20.5s-7-4.3-9.3-9A5 5 0 0 1 12 6.6a5 5 0 0 1 9.3 4.9c-2.3 4.7-9.3 9-9.3 9Z"/></svg><span id="gratStreak"></span></div>
       </div>
+      <div class="eyebrow">Seu diário de gratidão</div>
+      <div class="card" id="gratList"></div>
       <div class="eyebrow">Meus momentos de oração</div>
       <div class="tasks" id="prayerList"></div>
     </section>
@@ -372,12 +395,8 @@
         <button class="btn block" id="pushBtn" style="margin-top:0">Ativar notificações</button>
         <p class="hint">Primeiro <b>Adicione à Tela de Início</b> e abra pelo ícone. Depois toque aqui e <b>permita</b> — aí os lembretes da sua rotina chegam sozinhos, mesmo com o celular trancado.</p>
       </div>
-      <div class="card rowcard" style="margin-top:12px">
-        <div class="mid" style="flex:1"><div class="nm" style="font-weight:600">Palavra do dia de manhã</div>
-          <div class="times" id="mvTimes" style="color:var(--muted);font-size:12.5px;margin-top:3px"></div>
-          <button class="btn sm ghost" id="mvEdit" style="margin-top:9px">Mudar horário</button></div>
-        <div class="toggle" id="mvToggle"></div>
-      </div>
+      <div class="eyebrow">Lembretes especiais</div>
+      <div class="card" id="specialEditor"></div>
 
       <div class="eyebrow">Sono — app Saúde do iPhone</div>
       <div class="card">
@@ -552,7 +571,7 @@
     if($("#verseTextHoje")){$("#verseTextHoje").textContent=VERSES[vi][0];$("#verseRefHoje").textContent=VERSES[vi][1];}
     $("#gratInput").value=(day&&day.gratidao)||"";
 
-    renderRewards();renderBlockEditor();renderMood();renderJornada();renderSleep();renderMorningVerse();
+    renderRewards();renderBlockEditor();renderMood();renderJornada();renderSleep();renderSpecials();renderGratitude();renderReport();
     $("#weekendToggle").classList.toggle("on",weekendFlex);
   }
   function taskRow(x){
@@ -610,7 +629,9 @@
     {id:"cheio",nm:"Dia completo",dc:"Concluiu tudo em um dia",on:()=>Object.values(app.history||{}).some(h=>h&&h.p>=100)},
     {id:"xp250",nm:"250 de XP",dc:"Acumulou 250 de experiência",on:()=>(app.xp||0)>=250},
     {id:"xp1000",nm:"Mil de XP",dc:"Acumulou 1000 de experiência",on:()=>(app.xp||0)>=1000},
-    {id:"ativo7",nm:"Presente",dc:"Registrou 7 dias de progresso",on:()=>Object.keys(app.history||{}).length>=7}
+    {id:"ativo7",nm:"Presente",dc:"Registrou 7 dias de progresso",on:()=>Object.keys(app.history||{}).length>=7},
+    {id:"grato7",nm:"Coração grato",dc:"7 dias seguidos de gratidão",on:()=>gratStreak()>=7},
+    {id:"grato30",nm:"Mês de gratidão",dc:"30 dias seguidos de gratidão",on:()=>gratStreak()>=30}
   ];
   function checkBadges(){app.badges=app.badges||{};const nw=[];BADGES.forEach(b=>{if(b.on()&&!app.badges[b.id]){app.badges[b.id]=Date.now();nw.push(b);}});return nw;}
   function syncTodayHistory(){const inst=instances();const done=inst.filter(x=>isDone(x.iid)).length;
@@ -724,17 +745,60 @@
       app.blocks=app.blocks.filter(x=>x!==b);closeModal();render();saveApp({blocks:app.blocks});toast("Bloco apagado");};
   }
   // palavra do dia na tela bloqueada de manhã (ligada por padrão)
-  function mv(){return Object.assign({on:true,t:"06:45"},(app&&app.morningVerse)||{});}
-  function renderMorningVerse(){const v=mv();$("#mvToggle").classList.toggle("on",v.on);
-    $("#mvTimes").textContent=v.on?("Chega às "+v.t+" na tela bloqueada, com o versículo e um lembrete pra orar."):"Desligada.";}
-  function editMorningVerse(){
-    openModal('<div class="mq">Palavra do dia</div><div class="form-row"><label class="fld">Horário da manhã</label><input type="time" id="mvT" value="'+esc(mv().t)+'"></div><div class="actions"><button class="btn ghost" data-close>Cancelar</button><button class="btn" id="mvSave">Salvar</button></div>');
-    $("#mvSave").onclick=async()=>{const t=($("#mvT").value||"").slice(0,5);if(!/^\d{2}:\d{2}$/.test(t)){toast("Escolha um horário.");return;}
-      closeModal();await saveApp({morningVerse:Object.assign(mv(),{t,on:true})});render();toast("Palavra do dia às "+t);};
+  // lembretes especiais (o mj-push monta o texto de cada kind): palavra de manhã, gratidão e relatório da noite
+  const SPECIALS=[
+    {k:"verso",nm:"Palavra do dia",ic:"book",t:"06:45",label:"Palavra de hoje",dc:"o versículo do dia e um lembrete pra orar"},
+    {k:"gratidao",nm:"Gratidão",ic:"heart",t:"21:15",label:"Gratidão de hoje",dc:"“pelo que você foi grato hoje?” (só se ainda não escreveu)"},
+    {k:"relatorio",nm:"Relatório do dia",ic:"star",t:"22:00",label:"Relatório do dia",dc:"seu dia em verde, amarelo ou vermelho"}];
+  function special(k){const d=SPECIALS.find(s=>s.k===k);const saved=(app&&app.specials&&app.specials[k])||(k==="verso"&&app&&app.morningVerse)||{};return Object.assign({on:true,t:d.t},saved);}
+  async function setSpecial(k,p){app.specials=Object.assign({},app.specials||{});app.specials[k]=Object.assign(special(k),p);await saveApp({specials:app.specials});render();}
+  function renderSpecials(){const box=$("#specialEditor");box.innerHTML="";
+    SPECIALS.forEach(s=>{const v=special(s.k);const row=el("div","blk");row.appendChild(chip(s.ic));
+      const mid=el("div","mid");mid.appendChild(Object.assign(el("div","nm"),{textContent:s.nm}));
+      mid.appendChild(Object.assign(el("div","times"),{textContent:v.on?("Às "+v.t+" — "+s.dc):"Desligado"}));
+      const eb=el("button","btn sm ghost ed");eb.textContent="Mudar horário";eb.onclick=()=>editSpecial(s);mid.appendChild(eb);row.appendChild(mid);
+      const tg=el("div","toggle"+(v.on?" on":""));tg.onclick=()=>setSpecial(s.k,{on:!v.on});row.appendChild(tg);box.appendChild(row);});}
+  function editSpecial(s){
+    openModal('<div class="mq">'+esc(s.nm)+'</div><div class="form-row"><label class="fld">Horário</label><input type="time" id="spT" value="'+esc(special(s.k).t)+'"></div><div class="actions"><button class="btn ghost" data-close>Cancelar</button><button class="btn" id="spSave">Salvar</button></div>');
+    $("#spSave").onclick=async()=>{const t=($("#spT").value||"").slice(0,5);if(!/^\d{2}:\d{2}$/.test(t)){toast("Escolha um horário.");return;}
+      closeModal();await setSpecial(s.k,{t,on:true});toast(s.nm+" às "+t);};
   }
+
+  // ---- gratidão: diário, sequência e +5 pontos na primeira do dia ----
+  const GRAT_PTS=5;
+  const gratOf=d=>String((STORE.days[d]&&STORE.days[d].gratidao)||"").trim();
+  function gratStreak(){let n=0,i=gratOf(todayStr())?0:1;for(;;i++){if(gratOf(todayStr(new Date(Date.now()-i*864e5))))n++;else break;}return n;}
+  function fmtDay(d){const p=d.split("-");const dt=new Date(+p[0],+p[1]-1,+p[2]);return dt.toLocaleDateString("pt-BR",{weekday:"short",day:"numeric",month:"short"}).replace(/\./g,"");}
+  function renderGratitude(){
+    const s=gratStreak();$("#gratStreak").textContent=s?(s+(s>1?" dias seguidos agradecendo":" dia agradecendo")):"Comece hoje sua sequência de gratidão";
+    const list=$("#gratList");list.innerHTML="";
+    const ds=Object.keys(STORE.days).filter(d=>d!==dateKey&&gratOf(d)).sort().reverse().slice(0,60);
+    if(!ds.length){list.appendChild(Object.assign(el("div","empty"),{textContent:"Suas gratidões dos outros dias aparecem aqui."}));return;}
+    ds.forEach(d=>{const it=el("div","grat-it");it.appendChild(Object.assign(el("div","grat-d"),{textContent:fmtDay(d)}));
+      it.appendChild(Object.assign(el("div","grat-t"),{textContent:gratOf(d)}));list.appendChild(it);});
+  }
+
+  // ---- relatório do dia: mesma regra do servidor (mj-push → dayReport) ----
+  function dayReport(){
+    const inst=instances();const n=inst.length,k=inst.filter(x=>isDone(x.iid)).length,p=n?Math.round(k/n*100):0;
+    const grat=!!gratOf(dateKey);const color=p>=70&&grat?"verde":p<35?"vermelho":"amarelo";
+    const missing=[...new Set(inst.filter(x=>!isDone(x.iid)&&x.b.critical).map(x=>x.b.label))].slice(0,3);
+    const lines=[k+" de "+n+" da rotina ("+p+"%)",grat?"Gratidão feita ✓":"Falta a gratidão — ainda dá tempo."];
+    const sg=sleepGoal();if(sg&&sg.late!=null)lines.push(sg.late>15?("Deitou "+durTxt(sg.late)+" depois da meta"):"Dormiu na meta ✓");
+    if(missing.length)lines.push("Faltou: "+missing.join(", "));
+    return{color,lines};
+  }
+  function renderReport(){const r=dayReport();const c=$("#reportCard");c.className="card report "+r.color;
+    $("#reportTitle").textContent=r.color==="verde"?"Dia verde":r.color==="amarelo"?"Dia amarelo":"Dia vermelho, por enquanto";
+    $("#reportLines").innerHTML="";r.lines.forEach(l=>$("#reportLines").appendChild(Object.assign(el("div"),{textContent:l})));}
   async function saveName(){app.name=($("#nameInput").value||"").trim();await saveApp({name:app.name});render();toast("Salvo");}
   async function saveGrat(){day=day||{completed:{},points:0,gratidao:"",mood:0};day.gratidao=($("#gratInput").value||"").trim();
-    try{await dayRef.set({completed:day.completed||{},points:day.points||0,gratidao:day.gratidao,mood:day.mood||0});toast("Gratidão guardada");}catch(e){toast("Não consegui salvar.");}}
+    const award=!!day.gratidao&&!day.gp; // +5 só na primeira gratidão do dia
+    try{await dayRef.set({completed:day.completed||{},points:day.points||0,gratidao:day.gratidao,mood:day.mood||0,gp:day.gp||award});
+      if(award){app.totalPoints=(app.totalPoints||0)+GRAT_PTS;app.xp=(app.xp||0)+GRAT_PTS;const nv=checkBadges();
+        await appRef.update({totalPoints:app.totalPoints,xp:app.xp,badges:app.badges||{}});
+        if(nv.length)setTimeout(()=>toast("Nova conquista: "+nv[0].nm),1200);}
+      render();toast(award?("Gratidão guardada · +"+GRAT_PTS+" pontos"):"Gratidão guardada");}catch(e){toast("Não consegui salvar.");}}
   async function saveApp(p){try{await appRef.update(p);}catch(e){}}
   function setWinddown(on){winddown=on;document.body.classList.toggle("winddown",on);LS("mj_wd",on?"1":"0");const b=$("#wdBtn");if(b)b.classList.toggle("on",on);}
 
@@ -750,8 +814,6 @@
   $("#wdBtn").onclick=()=>setWinddown(!winddown);
   $("#addRewardBtn").onclick=addReward;
   $("#addBlockBtn").onclick=()=>editBlock(null);
-  $("#mvEdit").onclick=editMorningVerse;
-  $("#mvToggle").onclick=async()=>{await saveApp({morningVerse:Object.assign(mv(),{on:!mv().on})});render();};
   $("#gratSave").onclick=saveGrat;
   $("#nameSave").onclick=saveName;
   $("#weekendToggle").onclick=async()=>{weekendFlex=!weekendFlex;app.weekendFlex=weekendFlex;render();await saveApp({weekendFlex});};
@@ -770,10 +832,11 @@
   try{const raw=localStorage.getItem("mjState");if(raw)STORE=JSON.parse(raw);}catch(e){}
   if(!STORE.days)STORE.days={};
   function persist(){try{localStorage.setItem("mjState",JSON.stringify(STORE));}catch(e){}saveRemote();}
-  function makeDayRef(d){return{set:async(o)=>{STORE.days[d]=o;if(d===dateKey)day=o;persist();},onSnapshot:cb=>{cb({exists:!!STORE.days[d],data:()=>STORE.days[d]});return ()=>{};}};}
+  // set mescla com o que já existe no dia: não perde campos extras (ex.: gp = gratidão já pontuada)
+  function makeDayRef(d){return{set:async(o)=>{o=Object.assign({},STORE.days[d],o);STORE.days[d]=o;if(d===dateKey)day=o;persist();},onSnapshot:cb=>{cb({exists:!!STORE.days[d],data:()=>STORE.days[d]});return ()=>{};}};}
   appRef={update:async p=>{Object.assign(app,p);STORE.app=app;persist();syncSchedule();},set:async o=>{app=o;STORE.app=app;persist();syncSchedule();},get:async()=>({exists:!!STORE.app,data:()=>STORE.app}),collection:()=>({doc:d=>makeDayRef(d)})};
   function buildSchedule(){const out=[];((app&&app.blocks)||[]).forEach(b=>{if(!b.enabled)return;(b.times||[]).forEach(t=>out.push({t:t,label:b.label}));});
-    const v=mv();if(v.on)out.push({t:v.t,label:"Palavra de hoje",kind:"verso"}); // mj-push troca pelo versículo do dia + "Lembre-se de orar"
+    SPECIALS.forEach(s=>{const v=special(s.k);if(v.on)out.push({t:v.t,label:s.label,kind:s.k});}); // mj-push monta o texto de cada kind
     return out;}
   let syncT=null;
   function syncSchedule(){if(!sb)return;clearTimeout(syncT);syncT=setTimeout(async()=>{try{await sb.from("mj_devices").upsert({id:deviceId,schedule:buildSchedule(),tz:"America/Sao_Paulo",enabled:true,user_id:(currentUser?currentUser.id:null),last_seen:new Date().toISOString()});}catch(e){}},900);}
@@ -806,13 +869,29 @@
         sb.from("mj_sleep").select("night,bed,wake,minutes").gte("night",since).order("night"),
         sb.from("mj_tokens").select("token").maybeSingle()]);
       sleepRows=(r&&r.data)||[];sleepToken=(t&&t.data&&t.data.token)||null;
-      renderSleep();autoWake();
+      renderSleep();renderReport();autoWake();
     }catch(e){}
   }
+  // meta de sono = primeiro horário do bloco Dormir; conta em "minutos desde o meio-dia" pra atravessar a meia-noite
+  const noonMins=hm=>{const [h,m]=hm.split(":").map(Number);return((h*60+m)-720+1440)%1440;};
+  function goalBed(){const b=(app.blocks||[]).find(x=>x.id==="dormir");return((b&&b.times)||[])[0]||"23:00";}
+  function sleepGoal(){const s=sleepRows.find(r=>r.night===dateKey);if(!s)return null;
+    return{goal:goalBed(),late:noonMins(hhmm(s.bed))-noonMins(goalBed())};}
+  // regularidade: desvio-padrão do horário de deitar e de acordar nas últimas 7 noites (≤15 min = 100, ≥2h = 0)
+  function regularity(){const r=sleepRows.slice(-7);if(r.length<3)return null;
+    const sd=a=>{const m=a.reduce((x,y)=>x+y,0)/a.length;return Math.sqrt(a.reduce((x,y)=>x+(y-m)*(y-m),0)/a.length);};
+    const sb=sd(r.map(s=>noonMins(hhmm(s.bed)))),sw=sd(r.map(s=>{const w=new Date(s.wake);return w.getHours()*60+w.getMinutes();}));
+    const avg=(sb+sw)/2;return{score:Math.max(0,Math.min(100,Math.round(100-(avg-15)*100/105))),sd:Math.round(avg)};}
   function renderSleep(){
     const today=sleepRows.find(s=>s.night===dateKey);
     $("#sleepCard").hidden=!today;
-    if(today){$("#sleepLine").textContent="Dormiu "+hhmm(today.bed)+" · Acordou "+hhmm(today.wake);$("#sleepDur").textContent=durTxt(today.minutes);}
+    if(today){$("#sleepLine").textContent="Dormiu "+hhmm(today.bed)+" · Acordou "+hhmm(today.wake);$("#sleepDur").textContent=durTxt(today.minutes);
+      const g=sleepGoal(),gl=$("#sleepGoal");gl.classList.toggle("late",g.late>15);
+      gl.textContent=g.late>15?("Deitou "+durTxt(g.late)+" depois da meta ("+g.goal+")"):("Dentro da meta ("+g.goal+") ✓");}
+    const rg=regularity();$("#regRow").hidden=!rg;
+    if(rg){$("#regScore").textContent=rg.score+"/100";
+      $("#regHint").textContent="Seus horários variam ~"+(rg.sd<60?rg.sd+" min":durTxt(rg.sd))+" de uma noite pra outra. Dormir e acordar sempre no mesmo horário vale tanto quanto dormir bastante.";}
+    else $("#regHint").textContent=sleepRows.length?"A nota de regularidade aparece a partir de 3 noites.":"";
     $("#sleepSec").hidden=!sleepRows.length;
     if(sleepRows.length){
       const bars=$("#sleepBars");bars.innerHTML="";const by={};sleepRows.forEach(s=>by[s.night]=s);
