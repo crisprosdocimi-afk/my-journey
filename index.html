@@ -237,6 +237,21 @@
   .modal .form-row{text-align:left;margin-top:15px}
   .modal .actions{display:flex;gap:10px;margin-top:20px}
   .modal .actions .btn{flex:1}
+  /* ---- ajustes em setores ---- */
+  details.sect{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow-sm);margin-top:10px}
+  details.sect:first-child{margin-top:4px}
+  details.sect>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:13px;padding:14px 16px}
+  details.sect>summary::-webkit-details-marker{display:none}
+  details.sect>summary .st{flex:1;min-width:0;display:flex;flex-direction:column}
+  details.sect>summary .st b{font-size:15.5px;font-weight:650}
+  details.sect>summary .st small{color:var(--muted);font-size:12.5px;margin-top:1px}
+  details.sect>summary .chev{color:var(--faint);font-size:22px;line-height:1;transition:transform .2s}
+  details.sect[open]>summary .chev{transform:rotate(90deg);color:var(--accent)}
+  details.sect[open]>summary{border-bottom:1px solid var(--line)}
+  .sect-body{padding:14px 16px 16px}
+  .sect-body details.guide{box-shadow:none;background:var(--card-soft)}
+  .sect-body .rowcard.sub{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}
+  .sub-k{text-transform:uppercase;letter-spacing:.12em;font-size:10.5px;font-weight:700;color:var(--faint);margin:18px 0 4px}
   .sleepcard{display:flex;align-items:center;gap:13px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);padding:12px 15px;margin-top:12px;box-shadow:var(--shadow-sm)}
   .sleepcard .mid{flex:1;min-width:0}
   .sl-k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
@@ -383,86 +398,119 @@
     </section>
 
     <section class="view" id="v-ajustes">
-      <div class="eyebrow">Perfil</div>
-      <div class="card">
-        <label class="fld" for="nameInput">Seu nome</label>
-        <div class="rowcard" style="margin-top:0"><input type="text" id="nameInput" placeholder="Como quer ser chamado"><button class="btn sm" id="nameSave">Salvar</button></div>
-      </div>
-      <div class="eyebrow">Meus blocos do dia</div>
-      <div class="card" id="blockEditor"></div>
-      <button class="btn block ghost" id="addBlockBtn">＋ Novo bloco</button>
-      <div class="card rowcard" style="margin-top:12px">
-        <div class="mid" style="flex:1"><div class="nm" style="font-weight:600">Fim de semana flexível</div>
-          <div class="times" style="color:var(--muted);font-size:12.5px;margin-top:3px">Sáb e dom aparecem sem horário fixo — no seu tempo.</div></div>
-        <div class="toggle" id="weekendToggle"></div>
-      </div>
-
-      <div class="eyebrow">Notificações na tela bloqueada</div>
-      <div class="card">
-        <button class="btn block" id="pushBtn" style="margin-top:0">Ativar notificações</button>
-        <p class="hint">Primeiro <b>Adicione à Tela de Início</b> e abra pelo ícone. Depois toque aqui e <b>permita</b> — aí os lembretes da sua rotina chegam sozinhos, mesmo com o celular trancado.</p>
-      </div>
-      <div class="eyebrow">Lembretes especiais</div>
-      <div class="card" id="specialEditor"></div>
-
-      <div class="eyebrow">Sono — app Saúde do iPhone</div>
-      <div class="card">
-        <div id="sleepTokenBox" hidden>
-          <label class="fld" for="sleepUrl">Seu endereço pessoal (vai dentro do atalho)</label>
-          <div class="rowcard" style="margin-top:0"><input type="text" id="sleepUrl" readonly><button class="btn sm" id="sleepCopy">Copiar</button></div>
+      <!-- Ajustes em setores: cada um abre/fecha, todos começam fechados -->
+      <details class="sect">
+        <summary><span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="7.5" r="3.5"/><path d="M5 20.5a7 7 0 0 1 14 0"/></svg></span>
+          <span class="st"><b>Perfil</b><small>Seu nome</small></span><span class="chev">›</span></summary>
+        <div class="sect-body">
+          <label class="fld" for="nameInput">Seu nome</label>
+          <div class="rowcard" style="margin-top:0"><input type="text" id="nameInput" placeholder="Como quer ser chamado"><button class="btn sm" id="nameSave">Salvar</button></div>
         </div>
-        <button class="btn block" id="sleepGen" style="margin-top:0">Gerar meu código</button>
-        <p class="hint">Um atalho do iPhone lê seu sono no app Saúde toda manhã e manda pra cá. Se você acordar no horário, o bloco <b>Acordar</b> é marcado sozinho. Não compartilhe esse endereço.</p>
-      </div>
-      <details class="guide"><summary><span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg></span>Como montar o atalho do sono<span class="plus">＋</span></summary>
-        <div class="gc">É <b>uma automação só</b>, com duas ações. Copie seu endereço aqui em cima antes.<ol>
-          <li>App <b>Atalhos → Automação → ＋ → Hora do Dia</b>: 10:00, Diariamente, <b>Executar Imediatamente</b> → <b>Novo Atalho em Branco</b>.</li>
-          <li>Busque e toque em <b>Buscar Amostras de Saúde</b>. Tipo: <b>Sono</b> (não "Alteração de sono"). <b>Adicionar Filtro</b>: Data de Início está nos últimos <b>1 dia</b>. Deixe o <b>Limite desligado</b> (cinza).</li>
-          <li>Busque e toque em <b>Obter Conteúdo do URL</b>. Toque em <b>URL</b> e cole seu endereço.</li>
-          <li>Toque na setinha <b>›</b> do lado do endereço. Método: <b>POST</b>. Corpo da Solicitação: <b>JSON</b>.</li>
-          <li>Toque em <b>＋ Adicionar novo campo → Texto</b>. Chave: <b>bed</b>. No Texto, escolha <b>Amostras de Saúde</b> em cima do teclado, toque na bolinha azul e escolha <b>Data de Início</b>.</li>
-          <li>De novo <b>＋ Adicionar novo campo → Texto</b>. Chave: <b>wake</b>. Texto: <b>Amostras de Saúde</b> → <b>Data de Término</b>.</li>
-          <li>Toque em <b>▶️</b> pra testar: deve aparecer <b>"Sono registrado"</b>. Se você costuma acordar depois das 10h, ponha a automação mais tarde.</li>
-        </ol></div></details>
+      </details>
 
-      <div class="eyebrow">Redes sociais — tempo de tela</div>
-      <div class="card">
-        <div class="rowcard" style="margin-top:0"><div class="mid" style="flex:1"><div class="nm" style="font-weight:600">Limite por dia</div>
-          <div class="times" id="screenLimitTxt" style="color:var(--muted);font-size:12.5px;margin-top:3px"></div></div>
-          <button class="btn sm ghost" id="screenLimitEdit">Mudar</button></div>
-        <div id="screenUrls" hidden style="margin-top:14px">
-          <label class="fld">Endereço "app aberto"</label>
-          <div class="rowcard" style="margin-top:0"><input type="text" id="screenOpenUrl" readonly><button class="btn sm" data-copy="screenOpenUrl">Copiar</button></div>
-          <label class="fld" style="margin-top:12px">Endereço "app fechado"</label>
-          <div class="rowcard" style="margin-top:0"><input type="text" id="screenCloseUrl" readonly><button class="btn sm" data-copy="screenCloseUrl">Copiar</button></div>
+      <details class="sect">
+        <summary><span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg></span>
+          <span class="st"><b>Minha rotina</b><small>Blocos do dia, horários e fim de semana</small></span><span class="chev">›</span></summary>
+        <div class="sect-body">
+          <div id="blockEditor"></div>
+          <button class="btn block ghost" id="addBlockBtn">＋ Novo bloco</button>
+          <div class="rowcard sub">
+            <div class="mid" style="flex:1"><div class="nm" style="font-weight:600">Fim de semana flexível</div>
+              <div class="times" style="color:var(--muted);font-size:12.5px;margin-top:3px">Sáb e dom aparecem sem horário fixo — no seu tempo.</div></div>
+            <div class="toggle" id="weekendToggle"></div>
+          </div>
         </div>
-        <p class="hint" id="screenHint">O iPhone não deixa nenhum app ler o Tempo de Uso. Então duas automações do Atalhos avisam o My Journey quando você abre e fecha as redes — e a gente mede.</p>
-      </div>
-      <details class="guide"><summary><span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg></span>Como montar as automações das redes<span class="plus">＋</span></summary>
-        <div class="gc">São <b>duas automações</b>, cada uma com <b>uma ação só</b>. Não precisa de campo nenhum.<ol>
-          <li><b>Atalhos → Automação → ＋ → App</b>. Toque em <b>Escolher</b> e marque Instagram, Facebook, WhatsApp (e o que mais quiser medir). Deixe marcado só <b>É Aberto</b>. <b>Executar Imediatamente</b> → Seguinte → <b>Novo Atalho em Branco</b>.</li>
-          <li>Busque <b>Obter Conteúdo do URL</b>, toque em <b>URL</b> e cole o endereço <b>"app aberto"</b> daqui de cima. Toque em OK. Pronto, a primeira acabou.</li>
-          <li>Crie a segunda igual: <b>＋ → App</b>, os <b>mesmos apps</b>, mas marque só <b>É Fechado</b>. Cole o endereço <b>"app fechado"</b>.</li>
-          <li>Teste: abra o Instagram, saia, e volte aqui. O cartão "Redes sociais hoje" aparece em Hoje.</li>
-        </ol></div></details>
+      </details>
 
-      <div class="eyebrow">iPhone — reforço (opcional)</div>
-      <details class="guide"><summary><span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 1.5M9 2h6M12 5V2"/></svg></span>Alarmes que te acordam e lembram<span class="plus">＋</span></summary>
-        <div class="gc">Só o app nativo da Apple toca com o celular bloqueado. O My Journey mostra os horários; crie os alarmes nativos pra eles:
-          <ol><li>Abra <b>Relógio → Alarmes</b> e crie um pra cada horário crítico (acordar, orar, dormir).</li>
-          <li>Pros outros lembretes, dá pra usar o app <b>Lembretes</b> com hora e som.</li></ol></div></details>
-      <details class="guide"><summary><span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg></span>Limitar Instagram, Facebook, TikTok, YouTube<span class="plus">＋</span></summary>
-        <div class="gc"><ol><li><b>Ajustes → Tempo de Uso</b>.</li><li><b>Limites de App → Adicionar Limite</b>.</li>
-          <li>Marque <b>Redes Sociais</b> e <b>Entretenimento</b> (ou cada app).</li>
-          <li>Defina <b>30 minutos</b> por dia e ative <b>Bloquear no Limite</b>.</li>
-          <li>Ponha uma senha do Tempo de Uso pra não burlar fácil.</li></ol></div></details>
-      <details class="guide"><summary><span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg></span>Tirar a luz azul à noite<span class="plus">＋</span></summary>
-        <div class="gc"><b>Ajustes → Tela e Brilho → Night Shift</b>, programado pro seu horário de desacelerar. O modo <b>Desacelerar</b> aqui no app também aquece a tela.</div></details>
-      <details class="guide"><summary><span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><path d="M12 15V3M8 7l4-4 4 4M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg></span>Instalar na tela de início<span class="plus">＋</span></summary>
-        <div class="gc">No Safari: toque em <b>Compartilhar</b> → <b>Adicionar à Tela de Início</b>. Vira um app de verdade.</div></details>
+      <details class="sect">
+        <summary><span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15L6 16ZM10 20.5a2 2 0 0 0 4 0"/></svg></span>
+          <span class="st"><b>Notificações</b><small>Tela bloqueada, Palavra, gratidão e relatório</small></span><span class="chev">›</span></summary>
+        <div class="sect-body">
+          <button class="btn block" id="pushBtn" style="margin-top:0">Ativar notificações</button>
+          <p class="hint">Primeiro <b>Adicione à Tela de Início</b> e abra pelo ícone. Depois toque aqui e <b>permita</b> — aí os lembretes da sua rotina chegam sozinhos, mesmo com o celular trancado.</p>
+          <div class="sub-k">Lembretes especiais</div>
+          <div id="specialEditor"></div>
+        </div>
+      </details>
 
-      <p class="hint" id="syncNote">Seus dados ficam privados na sua conta e sincronizam entre seus aparelhos.</p>
-      <button class="btn ghost block" id="logoutBtn" hidden style="margin-top:12px">Sair da conta</button>
+      <details class="sect">
+        <summary><span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg></span>
+          <span class="st"><b>Sono</b><small>Ligação com o app Saúde</small></span><span class="chev">›</span></summary>
+        <div class="sect-body">
+          <div id="sleepTokenBox" hidden>
+            <label class="fld" for="sleepUrl">Seu endereço do sono (vai dentro do atalho)</label>
+            <div class="rowcard" style="margin-top:0"><input type="text" id="sleepUrl" readonly><button class="btn sm" id="sleepCopy">Copiar</button></div>
+          </div>
+          <p class="hint" id="sleepNoToken" hidden>Primeiro gere seu código em <b>Conta e privacidade</b> (último setor aqui embaixo).</p>
+          <p class="hint">Um atalho do iPhone lê seu sono no app Saúde toda manhã e manda pra cá. Se você acordar no horário, o bloco <b>Acordar</b> é marcado sozinho.</p>
+          <details class="guide"><summary><span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg></span>Como montar o atalho do sono<span class="plus">＋</span></summary>
+            <div class="gc">É <b>uma automação só</b>, com duas ações. Copie seu endereço aqui em cima antes.<ol>
+              <li>App <b>Atalhos → Automação → ＋ → Hora do Dia</b>: 10:00, Diariamente, <b>Executar Imediatamente</b> → <b>Novo Atalho em Branco</b>.</li>
+              <li>Busque e toque em <b>Buscar Amostras de Saúde</b>. Tipo: <b>Sono</b> (não "Alteração de sono"). <b>Adicionar Filtro</b>: Data de Início está nos últimos <b>1 dia</b>. Deixe o <b>Limite desligado</b> (cinza).</li>
+              <li>Busque e toque em <b>Obter Conteúdo do URL</b>. Toque em <b>URL</b> e cole seu endereço.</li>
+              <li>Toque na setinha <b>›</b> do lado do endereço. Método: <b>POST</b>. Corpo da Solicitação: <b>JSON</b>.</li>
+              <li>Toque em <b>＋ Adicionar novo campo → Texto</b>. Chave: <b>bed</b>. No Texto, escolha <b>Amostras de Saúde</b> em cima do teclado, toque na bolinha azul e escolha <b>Data de Início</b>.</li>
+              <li>De novo <b>＋ Adicionar novo campo → Texto</b>. Chave: <b>wake</b>. Texto: <b>Amostras de Saúde</b> → <b>Data de Término</b>.</li>
+              <li>Toque em <b>▶️</b> pra testar: deve aparecer <b>"Sono registrado"</b>. Se você costuma acordar depois das 10h, ponha a automação mais tarde.</li>
+            </ol></div></details>
+        </div>
+      </details>
+
+      <details class="sect">
+        <summary><span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg></span>
+          <span class="st"><b>Redes sociais</b><small>Tempo de tela e limite por dia</small></span><span class="chev">›</span></summary>
+        <div class="sect-body">
+          <div class="rowcard" style="margin-top:0"><div class="mid" style="flex:1"><div class="nm" style="font-weight:600">Limite por dia</div>
+            <div class="times" id="screenLimitTxt" style="color:var(--muted);font-size:12.5px;margin-top:3px"></div></div>
+            <button class="btn sm ghost" id="screenLimitEdit">Mudar</button></div>
+          <div id="screenUrls" hidden style="margin-top:14px">
+            <label class="fld">Endereço "app aberto"</label>
+            <div class="rowcard" style="margin-top:0"><input type="text" id="screenOpenUrl" readonly><button class="btn sm" data-copy="screenOpenUrl">Copiar</button></div>
+            <label class="fld" style="margin-top:12px">Endereço "app fechado"</label>
+            <div class="rowcard" style="margin-top:0"><input type="text" id="screenCloseUrl" readonly><button class="btn sm" data-copy="screenCloseUrl">Copiar</button></div>
+          </div>
+          <p class="hint" id="screenHint"></p>
+          <details class="guide"><summary><span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg></span>Como montar as automações das redes<span class="plus">＋</span></summary>
+            <div class="gc">São <b>duas automações</b>, cada uma com <b>uma ação só</b>. Não precisa de campo nenhum.<ol>
+              <li><b>Atalhos → Automação → ＋ → App</b>. Toque em <b>Escolher</b> e marque Instagram, Facebook, WhatsApp (e o que mais quiser medir). Deixe marcado só <b>É Aberto</b>. <b>Executar Imediatamente</b> → Seguinte → <b>Novo Atalho em Branco</b>.</li>
+              <li>Busque <b>Obter Conteúdo do URL</b>, toque em <b>URL</b> e cole o endereço <b>"app aberto"</b> daqui de cima. Toque em OK. Pronto, a primeira acabou.</li>
+              <li>Crie a segunda igual: <b>＋ → App</b>, os <b>mesmos apps</b>, mas marque só <b>É Fechado</b>. Cole o endereço <b>"app fechado"</b>.</li>
+              <li>Teste: abra o Instagram, saia, e volte aqui. O cartão "Redes sociais hoje" aparece em Hoje.</li>
+            </ol></div></details>
+        </div>
+      </details>
+
+      <details class="sect">
+        <summary><span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9M12 7v5l3 2"/><path d="M16 3h5v5"/></svg></span>
+          <span class="st"><b>Dicas do iPhone</b><small>Alarmes, limites, luz azul, instalar</small></span><span class="chev">›</span></summary>
+        <div class="sect-body">
+          <details class="guide"><summary><span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 1.5M9 2h6M12 5V2"/></svg></span>Alarmes que te acordam e lembram<span class="plus">＋</span></summary>
+            <div class="gc">Só o app nativo da Apple toca com o celular bloqueado. O My Journey mostra os horários; crie os alarmes nativos pra eles:
+              <ol><li>Abra <b>Relógio → Alarmes</b> e crie um pra cada horário crítico (acordar, orar, dormir).</li>
+              <li>Pros outros lembretes, dá pra usar o app <b>Lembretes</b> com hora e som.</li></ol></div></details>
+          <details class="guide"><summary><span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg></span>Limitar Instagram, Facebook, TikTok, YouTube<span class="plus">＋</span></summary>
+            <div class="gc"><ol><li><b>Ajustes → Tempo de Uso</b>.</li><li><b>Limites de App → Adicionar Limite</b>.</li>
+              <li>Marque <b>Redes Sociais</b> e <b>Entretenimento</b> (ou cada app).</li>
+              <li>Defina <b>30 minutos</b> por dia e ative <b>Bloquear no Limite</b>.</li>
+              <li>Ponha uma senha do Tempo de Uso pra não burlar fácil.</li></ol></div></details>
+          <details class="guide"><summary><span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg></span>Tirar a luz azul à noite<span class="plus">＋</span></summary>
+            <div class="gc"><b>Ajustes → Tela e Brilho → Night Shift</b>, programado pro seu horário de desacelerar. O modo <b>Desacelerar</b> aqui no app também aquece a tela.</div></details>
+          <details class="guide"><summary><span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><path d="M12 15V3M8 7l4-4 4 4M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg></span>Instalar na tela de início<span class="plus">＋</span></summary>
+            <div class="gc">No Safari: toque em <b>Compartilhar</b> → <b>Adicionar à Tela de Início</b>. Vira um app de verdade.</div></details>
+        </div>
+      </details>
+
+      <details class="sect">
+        <summary><span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg></span>
+          <span class="st"><b>Conta e privacidade</b><small>Código pessoal, sincronização, sair</small></span><span class="chev">›</span></summary>
+        <div class="sect-body">
+          <div class="nm" style="font-weight:600">Código pessoal</div>
+          <p class="hint" style="margin-top:4px">É ele que liga o sono e as redes à sua conta. Não compartilhe os endereços. Se vazar, gere um novo — o antigo para de funcionar e você cola os novos nos atalhos.</p>
+          <button class="btn block" id="sleepGen">Gerar meu código</button>
+          <p class="hint" id="syncNote">Seus dados ficam privados na sua conta e sincronizam entre seus aparelhos.</p>
+          <button class="btn ghost block" id="logoutBtn" hidden style="margin-top:12px">Sair da conta</button>
+        </div>
+      </details>
     </section>
   </main>
 
@@ -938,7 +986,7 @@
       const avg=Math.round(sleepRows.reduce((a,s)=>a+s.minutes,0)/sleepRows.length);
       $("#sleepAvg").textContent="Média de "+durTxt(avg)+" por noite · "+sleepRows.length+" noite"+(sleepRows.length>1?"s":"")+" registrada"+(sleepRows.length>1?"s":"");
     }
-    $("#sleepTokenBox").hidden=!sleepToken;
+    $("#sleepTokenBox").hidden=!sleepToken;$("#sleepNoToken").hidden=!!sleepToken;
     if(sleepToken)$("#sleepUrl").value=sleepUrl();
     $("#sleepGen").textContent=sleepToken?"Gerar código novo (invalida o antigo)":"Gerar meu código";
     $("#sleepGen").classList.toggle("ghost",!!sleepToken);
@@ -978,7 +1026,7 @@
     $("#screenLimitTxt").textContent=durTxt(lim)+" em redes sociais. Passou disso, o relatório da noite avisa.";
     $("#screenUrls").hidden=!sleepToken;
     if(sleepToken){$("#screenOpenUrl").value=screenUrl("open");$("#screenCloseUrl").value=screenUrl("close");}
-    $("#screenHint").textContent=sleepToken?"O iPhone não deixa nenhum app ler o Tempo de Uso. Então duas automações do Atalhos avisam o My Journey quando você abre e fecha as redes — e a gente mede.":"Primeiro gere seu código na seção Sono aqui em cima — o mesmo código serve pras redes.";
+    $("#screenHint").textContent=sleepToken?"O iPhone não deixa nenhum app ler o Tempo de Uso. Então duas automações do Atalhos avisam o My Journey quando você abre e fecha as redes — e a gente mede.":"Primeiro gere seu código em Conta e privacidade (último setor aqui embaixo).";
   }
   document.querySelectorAll("[data-copy]").forEach(b=>b.onclick=async()=>{const inp=$("#"+b.dataset.copy);
     try{await navigator.clipboard.writeText(inp.value);toast("Copiado");}catch(e){inp.select();toast("Segure e copie o endereço");}});
