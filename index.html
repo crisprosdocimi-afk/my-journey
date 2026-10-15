@@ -252,6 +252,9 @@
   .sect-body details.guide{box-shadow:none;background:var(--card-soft)}
   .sect-body .rowcard.sub{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}
   .sub-k{text-transform:uppercase;letter-spacing:.12em;font-size:10.5px;font-weight:700;color:var(--faint);margin:18px 0 4px}
+  .hardbanner{display:flex;align-items:center;gap:12px;margin-top:12px;padding:12px 14px;border-radius:var(--r-sm);
+    background:color-mix(in srgb,#8fb3e0 12%,var(--card));border:1px solid color-mix(in srgb,#8fb3e0 30%,transparent);font-size:13px;line-height:1.45}
+  .hardbanner span{flex:1}
   .sleepcard{display:flex;align-items:center;gap:13px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);padding:12px 15px;margin-top:12px;box-shadow:var(--shadow-sm)}
   .sleepcard .mid{flex:1;min-width:0}
   .sl-k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
@@ -337,6 +340,7 @@
           <div class="sl-goal" id="screenNote"></div></div>
         <div class="sl-dur" id="screenDur"></div>
       </div>
+      <div class="hardbanner" id="hardBanner" hidden><span id="hardWhy"></span><button class="btn sm ghost" id="hardFull">Mostrar tudo</button></div>
       <div class="cheer" id="cheer" hidden><svg class="i" viewBox="0 0 24 24"><path d="M12 3l1.9 3.9 4.3.6-3.1 3 .7 4.3L12 16.8 8.2 14.8l.7-4.3-3.1-3 4.3-.6L12 3Z"/></svg>Você apareceu hoje. Isso já é vitória.</div>
       <div class="mood">
         <div class="mood-top"><span>Como você está hoje?</span><span class="mood-label" id="moodLabel"></span></div>
@@ -643,11 +647,16 @@
 
   function greeting(){const h=new Date().getHours();if(h<5)return"Boa madrugada";if(h<12)return"Bom dia";if(h<18)return"Boa tarde";return"Boa noite";}
   function firstName(){const n=(app&&app.name||"").trim();return n?n.split(/\s+/)[0]:"";}
-  function instances(d){const wk=isWeekend(d);const list=[];(app.blocks||[]).forEach((b,bi)=>{if(!b.enabled)return;
+  function instances(d){const wk=isWeekend(d);const leve=!d&&hardDay();const list=[];(app.blocks||[]).forEach((b,bi)=>{if(!b.enabled||(leve&&!ESSENCIAIS.includes(b.id)))return;
     if(wk&&weekendFlex)list.push({iid:b.id+"#wk",b,time:null,order:bi});
     else if(!(b.times||[]).length)list.push({iid:b.id+"#dia",b,time:null,order:bi}); // sem horário: 1x no dia
     else b.times.forEach(t=>list.push({iid:b.id+"#"+t,b,time:t,order:bi}));});
     list.sort((a,c)=>{if(a.time&&c.time)return a.time<c.time?-1:a.time>c.time?1:a.order-c.order;if(a.time&&!c.time)return -1;if(!a.time&&c.time)return 1;return a.order-c.order;});return list;}
+  // dia difícil (mesma regra do servidor → dayState): dormiu < 6h ou humor 1-2 → só o essencial, sem cobrar o resto
+  const ESSENCIAIS=["acordar","orar","dormir"];
+  function hardDay(){if(!day||day.full)return false;const s=(typeof sleepRows!=="undefined")&&sleepRows.find(r=>r.night===dateKey);
+    return !!(s&&s.minutes<360)||day.mood===1||day.mood===2;}
+  function hardReason(){const s=sleepRows.find(r=>r.night===dateKey);return s&&s.minutes<360?("você dormiu "+durTxt(s.minutes)):"seu dia está pesado";}
   const isDone=iid=>!!(day&&day.completed&&day.completed[iid]);
   const iconFor=b=>(b&&b.icon)||BLOCK_ICON[b&&b.id]||"star";
 
@@ -671,6 +680,7 @@
       : done===inst.length?"Dia completo. Que orgulho de você."
       : done===0?"Seu dia começa com um passo." : "Bom ritmo. Siga assim, com calma.";
     $("#cheer").hidden=done===0;
+    const hd=hardDay();$("#hardBanner").hidden=!hd;if(hd)$("#hardWhy").textContent="Dia mais leve: "+hardReason()+". Hoje só o essencial — sem cobrar o resto.";
 
     const tl=$("#taskList");tl.innerHTML="";
     if(!inst.length)tl.appendChild(Object.assign(el("div","empty"),{textContent:"Nenhuma tarefa ativa. Ative seus blocos em Ajustes."}));
@@ -935,6 +945,7 @@
   $("#wdBtn").onclick=()=>setWinddown(!winddown);
   $("#addRewardBtn").onclick=addReward;
   $("#addBlockBtn").onclick=()=>editBlock(null);
+  $("#hardFull").onclick=async()=>{await dayRef.set({full:true});render();toast("Mostrando a rotina inteira");};
   $("#gratSave").onclick=saveGrat;
   $("#nameSave").onclick=saveName;
   $("#weekendToggle").onclick=async()=>{weekendFlex=!weekendFlex;app.weekendFlex=weekendFlex;render();await saveApp({weekendFlex});};
