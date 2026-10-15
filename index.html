@@ -486,7 +486,7 @@
 
       <details class="sect">
         <summary><span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><path d="M13 2.5 5 13.5h6l-1 8 8-11h-6l1-8Z"/></svg></span>
-          <span class="st"><b>Automações</b><small>Academia, escritório e gratidão pela Siri</small></span><span class="chev">›</span></summary>
+          <span class="st"><b>Automações</b><small>Academia, leitura, Desacelerar, Siri</small></span><span class="chev">›</span></summary>
         <div class="sect-body">
           <p class="hint" id="acaoNoToken" style="margin-top:0">Primeiro gere seu código em <b>Conta e privacidade</b> (último setor aqui embaixo).</p>
           <div id="acaoUrls" hidden>
@@ -498,7 +498,13 @@
             <div class="rowcard" style="margin-top:0"><input type="text" id="acaoAcadSaiu" readonly><button class="btn sm" data-copy="acaoAcadSaiu">Copiar</button></div>
             <label class="fld" style="margin-top:12px">Escritório — marca quando você chega lá</label>
             <div class="rowcard" style="margin-top:0"><input type="text" id="acaoEscritorio" readonly><button class="btn sm" data-copy="acaoEscritorio">Copiar</button></div>
-            <label class="fld" style="margin-top:12px">Gratidão pela Siri</label>
+            <label class="fld" style="margin-top:12px">Leitura — abriu o app (Bíblia, Kindle, Livros…)</label>
+            <div class="rowcard" style="margin-top:0"><input type="text" id="acaoLeituraAbriu" readonly><button class="btn sm" data-copy="acaoLeituraAbriu">Copiar</button></div>
+            <label class="fld" style="margin-top:12px">Leitura — fechou o app (marca Estudo se ficou 15 min)</label>
+            <div class="rowcard" style="margin-top:0"><input type="text" id="acaoLeituraFechou" readonly><button class="btn sm" data-copy="acaoLeituraFechou">Copiar</button></div>
+            <label class="fld" style="margin-top:12px">Desacelerar — Foco Dormir ligou</label>
+            <div class="rowcard" style="margin-top:0"><input type="text" id="acaoDesacelerar" readonly><button class="btn sm" data-copy="acaoDesacelerar">Copiar</button></div>
+            <label class="fld" style="margin-top:12px">Gratidão e humor pela Siri</label>
             <div class="rowcard" style="margin-top:0"><input type="text" id="acaoGratidao" readonly><button class="btn sm" data-copy="acaoGratidao">Copiar</button></div>
           </div>
           <details class="guide"><summary><span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><path d="M4 9v6M7 7v10M17 7v10M20 9v6M7 12h10"/></svg></span>Academia automática<span class="plus">＋</span></summary>
@@ -513,12 +519,22 @@
             <div class="gc"><ol>
               <li><b>Atalhos → Automação → ＋ → Chegar</b>. Toque em <b>Local</b> e escolha o endereço do escritório. <b>Executar Imediatamente</b> → <b>Novo Atalho em Branco</b>.</li>
               <li>Busque <b>Obter Conteúdo do URL</b> e cole o endereço do <b>Escritório</b>. OK.</li></ol></div></details>
-          <details class="guide"><summary><span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><path d="M12 20.5s-7-4.3-9.3-9A5 5 0 0 1 12 6.6a5 5 0 0 1 9.3 4.9c-2.3 4.7-9.3 9-9.3 9Z"/></svg></span>Gratidão pela Siri<span class="plus">＋</span></summary>
+          <details class="guide"><summary><span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><path d="M12 6.5C10.5 4.5 7.5 4 4.5 4.5v13C7.5 17 10.5 17.5 12 19.5M12 6.5C13.5 4.5 16.5 4 19.5 4.5v13C16.5 17 13.5 17.5 12 19.5M12 6.5v13"/></svg></span>Leitura automática<span class="plus">＋</span></summary>
+            <div class="gc">Ler <b>15 minutos</b> seguidos no app marca o <b>Estudo</b>. São duas automações:<ol>
+              <li><b>＋ → App</b> → Escolher: <b>YouVersion / Kindle / Livros</b> (o que você usa) → marque só <b>É Aberto</b> → Executar Imediatamente → <b>Obter Conteúdo do URL</b> com o endereço <b>"Leitura — abriu"</b>.</li>
+              <li>Igual, mas só <b>É Fechado</b> e o endereço <b>"Leitura — fechou"</b>.</li></ol></div></details>
+          <details class="guide"><summary><span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg></span>Desacelerar automático<span class="plus">＋</span></summary>
+            <div class="gc">Quando o <b>Foco Dormir</b> liga, marca o <b>Desacelerar</b> e esquenta a tela do app.<ol>
+              <li><b>＋ → Foco</b> (ou "Dormir") → escolha <b>Dormir</b> → <b>Ao Ativar</b> → Executar Imediatamente.</li>
+              <li><b>Obter Conteúdo do URL</b> com o endereço <b>"Desacelerar"</b>. OK.</li></ol>
+              Não usa o Foco Dormir? Programe em <b>Ajustes → Foco → Dormir</b> pro seu horário de dormir — ele também silencia o celular à noite.</div></details>
+          <details class="guide"><summary><span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><path d="M12 20.5s-7-4.3-9.3-9A5 5 0 0 1 12 6.6a5 5 0 0 1 9.3 4.9c-2.3 4.7-9.3 9-9.3 9Z"/></svg></span>Gratidão e humor pela Siri<span class="plus">＋</span></summary>
             <div class="gc">Esse é um <b>atalho</b> (não automação): você chama quando quiser.<ol>
               <li><b>Atalhos → Biblioteca (Atalhos) → ＋</b>. Lá em cima, renomeie pra <b>Gratidão</b>.</li>
               <li>Busque e adicione <b>Ditar Texto</b>.</li>
               <li>Busque <b>Obter Conteúdo do URL</b> e cole o endereço da <b>Gratidão</b>. Toque na setinha <b>›</b>: Método <b>POST</b>, Corpo <b>JSON</b>, <b>＋ Adicionar novo campo → Texto</b>: chave <b>texto</b>, valor <b>Texto Ditado</b> (aparece em cima do teclado).</li>
-              <li>(Opcional) <b>Falar Texto</b> com o <b>Conteúdo do URL</b> — a Siri responde "Gratidão guardada".</li>
+              <li><b>Humor junto (opcional):</b> antes do Obter Conteúdo, adicione <b>Pedir Entrada</b> → tipo <b>Número</b>, pergunta <b>"De 1 a 5, como foi seu dia?"</b>. No Obter Conteúdo, <b>＋ Adicionar novo campo → Texto</b>: chave <b>humor</b>, valor <b>Entrada Fornecida</b>.</li>
+              <li>(Opcional) <b>Falar Texto</b> com o <b>Conteúdo do URL</b> — a Siri responde "Gratidão guardada. Humor: Bom."</li>
               <li>Pronto: fale <b>"E aí Siri, Gratidão"</b> e dite. Dá pra pôr no Botão de Ação do iPhone também.</li>
             </ol></div></details>
         </div>
@@ -647,7 +663,8 @@
 
   function greeting(){const h=new Date().getHours();if(h<5)return"Boa madrugada";if(h<12)return"Bom dia";if(h<18)return"Boa tarde";return"Boa noite";}
   function firstName(){const n=(app&&app.name||"").trim();return n?n.split(/\s+/)[0]:"";}
-  function instances(d){const wk=isWeekend(d);const leve=!d&&hardDay();const list=[];(app.blocks||[]).forEach((b,bi)=>{if(!b.enabled||(leve&&!ESSENCIAIS.includes(b.id)))return;
+  // all: ignora o modo leve (automações marcam qualquer bloco)
+  function instances(d,all){const wk=isWeekend(d);const leve=!d&&!all&&hardDay();const list=[];(app.blocks||[]).forEach((b,bi)=>{if(!b.enabled||(leve&&!ESSENCIAIS.includes(b.id)))return;
     if(wk&&weekendFlex)list.push({iid:b.id+"#wk",b,time:null,order:bi});
     else if(!(b.times||[]).length)list.push({iid:b.id+"#dia",b,time:null,order:bi}); // sem horário: 1x no dia
     else b.times.forEach(t=>list.push({iid:b.id+"#"+t,b,time:t,order:bi}));});
@@ -875,7 +892,8 @@
   const SPECIALS=[
     {k:"verso",nm:"Palavra do dia",ic:"book",t:"06:45",label:"Palavra de hoje",dc:"o versículo do dia e um lembrete pra orar"},
     {k:"gratidao",nm:"Gratidão",ic:"heart",t:"21:15",label:"Gratidão de hoje",dc:"“pelo que você foi grato hoje?” (só se ainda não escreveu)"},
-    {k:"relatorio",nm:"Relatório do dia",ic:"star",t:"22:00",label:"Relatório do dia",dc:"seu dia em verde, amarelo ou vermelho"}];
+    {k:"relatorio",nm:"Relatório do dia",ic:"star",t:"22:00",label:"Relatório do dia",dc:"seu dia em verde, amarelo ou vermelho"},
+    {k:"semana",nm:"Resumo da semana",ic:"sun",t:"20:00",label:"Resumo da semana",dc:"só domingo: sua semana em números e um foco"}];
   function special(k){const d=SPECIALS.find(s=>s.k===k);const saved=(app&&app.specials&&app.specials[k])||(k==="verso"&&app&&app.morningVerse)||{};return Object.assign({on:true,t:d.t},saved);}
   async function setSpecial(k,p){app.specials=Object.assign({},app.specials||{});app.specials[k]=Object.assign(special(k),p);await saveApp({specials:app.specials});render();}
   function renderSpecials(){const box=$("#specialEditor");box.innerHTML="";
@@ -1078,10 +1096,15 @@
       for(const r of rows){const dKey=todayStr(new Date(r.at));ids.push(r.id);
         if(r.kind==="feito"){
           const blk=(app.blocks||[]).find(b=>b.id===r.bloco);const nm=blk?blk.label:r.bloco;
-          if(dKey===dateKey){const x=instances().find(i=>i.b.id===r.bloco&&!isDone(i.iid));
+          if(dKey===dateKey){const x=instances(undefined,true).find(i=>i.b.id===r.bloco&&!isDone(i.iid));
             if(x){while(writing)await new Promise(ok=>setTimeout(ok,50)); // toggle ignora se outro salvamento (ex.: Acordar automático) está em curso
               await toggle(x,true);if(isDone(x.iid))msgs.push(nm+" marcado ✓");}}
           else if(markPast(dKey,r.bloco)!=null)msgs.push(nm+" ("+fmtDay(dKey)+") marcado ✓");
+        }else if(r.kind==="humor"){const v=Math.max(1,Math.min(5,parseInt(r.texto,10)||0));
+          if(v){if(dKey===dateKey){await dayRef.set({mood:v});syncTodayHistory();}
+            else{STORE.days[dKey]=Object.assign({completed:{},points:0,gratidao:"",mood:0},STORE.days[dKey],{mood:v});
+              app.history=app.history||{};app.history[dKey]=Object.assign({p:0},app.history[dKey],{m:v});}
+            await appRef.update({history:app.history||{}});msgs.push("Humor: "+MOODS[v-1].l);}
         }else if(r.kind==="gratidao"&&r.texto){
           const d=dKey===dateKey?(day=day||{completed:{},points:0,gratidao:"",mood:0}):(STORE.days[dKey]=Object.assign({completed:{},points:0,gratidao:"",mood:0},STORE.days[dKey]));
           const g=String(d.gratidao||"").trim();const novo=g?(g+"\n"+r.texto):r.texto;const award=!d.gp;
@@ -1098,7 +1121,9 @@
   function renderAcoes(){
     $("#acaoUrls").hidden=!sleepToken;$("#acaoNoToken").hidden=!!sleepToken;
     if(sleepToken){$("#acaoAcademia").value=acaoUrl("do=feito&bloco=academia");
-      $("#acaoAcadChegou").value=acaoUrl("do=chegou&bloco=academia");$("#acaoAcadSaiu").value=acaoUrl("do=saiu&bloco=academia&min=30");$("#acaoEscritorio").value=acaoUrl("do=feito&bloco=escritorio");$("#acaoGratidao").value=acaoUrl("do=gratidao");}
+      $("#acaoAcadChegou").value=acaoUrl("do=chegou&bloco=academia");$("#acaoAcadSaiu").value=acaoUrl("do=saiu&bloco=academia&min=30");
+      $("#acaoLeituraAbriu").value=acaoUrl("do=chegou&bloco=estudo");$("#acaoLeituraFechou").value=acaoUrl("do=saiu&bloco=estudo&min=15");
+      $("#acaoDesacelerar").value=acaoUrl("do=feito&bloco=desacelerar");$("#acaoEscritorio").value=acaoUrl("do=feito&bloco=escritorio");$("#acaoGratidao").value=acaoUrl("do=gratidao");}
   }
 
   // link vindo da notificação: ?feito=<bloco>&t=<hh:mm> pergunta "Feito?"; ?abrir=<aba> abre a aba
