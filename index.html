@@ -603,7 +603,7 @@
 
   function greeting(){const h=new Date().getHours();if(h<5)return"Boa madrugada";if(h<12)return"Bom dia";if(h<18)return"Boa tarde";return"Boa noite";}
   function firstName(){const n=(app&&app.name||"").trim();return n?n.split(/\s+/)[0]:"";}
-  function instances(){const wk=isWeekend();const list=[];(app.blocks||[]).forEach((b,bi)=>{if(!b.enabled)return;
+  function instances(d){const wk=isWeekend(d);const list=[];(app.blocks||[]).forEach((b,bi)=>{if(!b.enabled)return;
     if(wk&&weekendFlex)list.push({iid:b.id+"#wk",b,time:null,order:bi});
     else if(!(b.times||[]).length)list.push({iid:b.id+"#dia",b,time:null,order:bi}); // sem horário: 1x no dia
     else b.times.forEach(t=>list.push({iid:b.id+"#"+t,b,time:t,order:bi}));});
@@ -915,7 +915,7 @@
   // set mescla com o que já existe no dia: não perde campos extras (ex.: gp = gratidão já pontuada)
   function makeDayRef(d){return{set:async(o)=>{o=Object.assign({},STORE.days[d],o);STORE.days[d]=o;if(d===dateKey)day=o;persist();},onSnapshot:cb=>{cb({exists:!!STORE.days[d],data:()=>STORE.days[d]});return ()=>{};}};}
   appRef={update:async p=>{Object.assign(app,p);STORE.app=app;persist();syncSchedule();},set:async o=>{app=o;STORE.app=app;persist();syncSchedule();},get:async()=>({exists:!!STORE.app,data:()=>STORE.app}),collection:()=>({doc:d=>makeDayRef(d)})};
-  function buildSchedule(){const out=[];((app&&app.blocks)||[]).forEach(b=>{if(!b.enabled)return;(b.times||[]).forEach(t=>out.push({t:t,label:b.label}));});
+  function buildSchedule(){const out=[];((app&&app.blocks)||[]).forEach(b=>{if(!b.enabled)return;(b.times||[]).forEach(t=>out.push({t:t,label:b.label,id:b.id}));}); // id: a notificação abre o app já perguntando "Feito?"
     SPECIALS.forEach(s=>{const v=special(s.k);if(v.on)out.push({t:v.t,label:s.label,kind:s.k});}); // mj-push monta o texto de cada kind
     return out;}
   let syncT=null;
@@ -954,7 +954,7 @@
         sb.from("mj_tokens").select("token").maybeSingle(),
         sb.from("mj_screen").select("at,ev").gte("at",dayStart.toISOString()).order("at")]);
       sleepRows=(r&&r.data)||[];sleepToken=(t&&t.data&&t.data.token)||null;screenEvents=(sc&&sc.data)||[];
-      renderSleep();renderScreen();renderReport();autoWake();
+      renderSleep();renderScreen();renderReport();autoWake();autoBed();
     }catch(e){}
   }
   // meta de sono = primeiro horário do bloco Dormir; conta em "minutos desde o meio-dia" pra atravessar a meia-noite
@@ -999,6 +999,34 @@
     const [h,m]=ref.split(":").map(Number);const w=new Date(s.wake);
     if(w.getHours()*60+w.getMinutes()<=h*60+m+30){toggle(x,true).then(()=>toast("Acordar marcado pelo seu sono"));}
   }
+  // deitou até 15 min depois da meta → marca o Dormir de ONTEM (a noite que acabou de passar)
+  function autoBed(){
+    const s=sleepRows.find(r=>r.night===dateKey);if(!s||!(noonMins(hhmm(s.bed))-noonMins(goalBed())<=15))return;
+    const yd=new Date(Date.now()-864e5);yd.setHours(12,0,0,0);const ydKey=todayStr(yd);
+    const yInst=instances(yd);const x=yInst.find(i=>i.b.id==="dormir");if(!x)return;
+    const d=STORE.days[ydKey]=Object.assign({completed:{},points:0,gratidao:"",mood:0},STORE.days[ydKey]);d.completed=d.completed||{};
+    if(d.completed[x.iid])return;
+    d.completed[x.iid]=true;const pts=x.b.points||0;d.points=(d.points||0)+pts;
+    app.totalPoints=(app.totalPoints||0)+pts;app.xp=(app.xp||0)+pts;
+    app.history=app.history||{};const done=yInst.filter(i=>d.completed[i.iid]).length;
+    app.history[ydKey]=Object.assign({m:0},app.history[ydKey],{p:yInst.length?Math.round(done/yInst.length*100):0});
+    appRef.update({totalPoints:app.totalPoints,xp:app.xp,history:app.history});render();
+    toast("Dormir de ontem marcado pelo seu sono · +"+pts);
+  }
+
+  // link vindo da notificação: ?feito=<bloco>&t=<hh:mm> pergunta "Feito?"; ?abrir=<aba> abre a aba
+  function handleDeepLink(){
+    const q=new URLSearchParams(location.search);if(!q.toString())return;
+    try{history.replaceState(null,"",location.pathname);}catch(e){} // limpa o link pra não perguntar de novo ao recarregar
+    const ab=q.get("abrir");if(ab){const tb=document.querySelector('.tab[data-tab="'+ab+'"]');if(tb)tb.click();
+      if(ab==="fe")setTimeout(()=>{const g=$("#gratInput");if(g&&!g.value)g.focus();},400);}
+    const id=q.get("feito");if(!id)return;const t=q.get("t");
+    const inst=instances();const x=inst.find(i=>i.b.id===id&&(i.time===t||!i.time))||inst.find(i=>i.b.id===id);if(!x)return;
+    if(isDone(x.iid)){toast(x.b.label+" já está feito ✓");return;}
+    openModal('<div class="burst">'+svg(iconFor(x.b))+'</div><div class="mq">'+esc(x.b.label)+(x.time?' · '+x.time:'')+'</div><div class="msub">Já fez? Um toque e tá marcado.</div><div class="actions"><button class="btn ghost" data-close>Agora não</button><button class="btn" id="dlDone">Feito ✓</button></div>');
+    $("#dlDone").onclick=()=>{closeModal();toggle(x);};
+  }
+
   async function genSleepToken(){
     if(!sb||!currentUser){toast("Entre na sua conta primeiro.");return;}
     const a=new Uint8Array(24);crypto.getRandomValues(a);const tk=Array.from(a,b=>b.toString(16).padStart(2,"0")).join("");
@@ -1046,7 +1074,7 @@
     showApp();render();
     const pb=$("#pushBtn");if(pb)pb.onclick=enablePush;updatePushUI();
     const lo=$("#logoutBtn");if(lo){lo.hidden=!(sb&&currentUser);lo.onclick=async()=>{try{await sb.auth.signOut();}catch(e){}};}
-    syncSchedule();saveRemote();loadSleep();
+    syncSchedule();saveRemote();loadSleep();handleDeepLink();
   }
   function showLogin(msg){$("#gate").hidden=false;$("#app").hidden=true;$("#gateRetry").hidden=true;
     $("#gateMsg").textContent="Entre pra continuar";$("#gateHint").textContent="Seu progresso fica guardado e sincroniza entre seus aparelhos.";

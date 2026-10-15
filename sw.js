@@ -6,12 +6,15 @@ self.addEventListener("push", (event) => {
   let d = {};
   try { d = event.data ? event.data.json() : {}; } catch (_) { d = { body: event.data ? event.data.text() : "" }; }
   const title = d.title || "My Journey";
+  // d.url é relativo ao app (ex.: "?feito=orar&t=07:00"): ao tocar, abre já perguntando "Feito?"
+  let url = self.registration.scope;
+  try { if (d.url && d.url !== "/") url = new URL(d.url, self.registration.scope).href; } catch (_) {}
   const options = {
     body: d.body || "",
     icon: "icon-192.png",
     badge: "icon-192.png",
     vibrate: [90, 40, 90],
-    data: { url: self.registration.scope },
+    data: { url },
   };
   event.waitUntil(self.registration.showNotification(title, options));
 });
