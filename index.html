@@ -128,7 +128,7 @@
   .verse-card .quote{font-family:var(--display);font-size:52px;line-height:0;color:var(--accent);opacity:.3;position:absolute;top:26px;left:16px}
   .verse{font-family:var(--display);font-size:20px;line-height:1.5;font-weight:500;text-wrap:balance;padding-left:30px}
   .verse-ref{color:var(--accent);font-weight:700;font-size:12.5px;margin-top:14px;letter-spacing:.06em;text-transform:uppercase;padding-left:30px}
-  textarea,input[type=text],input[type=number]{width:100%;background:var(--card-soft);border:1px solid var(--line-2);
+  textarea,input[type=text],input[type=number],input[type=time]{width:100%;background:var(--card-soft);border:1px solid var(--line-2);
     color:var(--fg);border-radius:12px;padding:12px;font:inherit;font-size:15px;resize:vertical}
   textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
   label.fld{display:block;font-size:12px;color:var(--muted);font-weight:600;margin:0 0 7px;letter-spacing:.02em}
@@ -372,6 +372,12 @@
         <button class="btn block" id="pushBtn" style="margin-top:0">Ativar notificações</button>
         <p class="hint">Primeiro <b>Adicione à Tela de Início</b> e abra pelo ícone. Depois toque aqui e <b>permita</b> — aí os lembretes da sua rotina chegam sozinhos, mesmo com o celular trancado.</p>
       </div>
+      <div class="card rowcard" style="margin-top:12px">
+        <div class="mid" style="flex:1"><div class="nm" style="font-weight:600">Palavra do dia de manhã</div>
+          <div class="times" id="mvTimes" style="color:var(--muted);font-size:12.5px;margin-top:3px"></div>
+          <button class="btn sm ghost" id="mvEdit" style="margin-top:9px">Mudar horário</button></div>
+        <div class="toggle" id="mvToggle"></div>
+      </div>
 
       <div class="eyebrow">Sono — app Saúde do iPhone</div>
       <div class="card">
@@ -546,7 +552,7 @@
     if($("#verseTextHoje")){$("#verseTextHoje").textContent=VERSES[vi][0];$("#verseRefHoje").textContent=VERSES[vi][1];}
     $("#gratInput").value=(day&&day.gratidao)||"";
 
-    renderRewards();renderBlockEditor();renderMood();renderJornada();renderSleep();
+    renderRewards();renderBlockEditor();renderMood();renderJornada();renderSleep();renderMorningVerse();
     $("#weekendToggle").classList.toggle("on",weekendFlex);
   }
   function taskRow(x){
@@ -717,6 +723,15 @@
       if(del.dataset.armed!=="1"){del.dataset.armed="1";del.textContent="Toque de novo pra apagar";return;}
       app.blocks=app.blocks.filter(x=>x!==b);closeModal();render();saveApp({blocks:app.blocks});toast("Bloco apagado");};
   }
+  // palavra do dia na tela bloqueada de manhã (ligada por padrão)
+  function mv(){return Object.assign({on:true,t:"06:45"},(app&&app.morningVerse)||{});}
+  function renderMorningVerse(){const v=mv();$("#mvToggle").classList.toggle("on",v.on);
+    $("#mvTimes").textContent=v.on?("Chega às "+v.t+" na tela bloqueada, com o versículo e um lembrete pra orar."):"Desligada.";}
+  function editMorningVerse(){
+    openModal('<div class="mq">Palavra do dia</div><div class="form-row"><label class="fld">Horário da manhã</label><input type="time" id="mvT" value="'+esc(mv().t)+'"></div><div class="actions"><button class="btn ghost" data-close>Cancelar</button><button class="btn" id="mvSave">Salvar</button></div>');
+    $("#mvSave").onclick=async()=>{const t=($("#mvT").value||"").slice(0,5);if(!/^\d{2}:\d{2}$/.test(t)){toast("Escolha um horário.");return;}
+      closeModal();await saveApp({morningVerse:Object.assign(mv(),{t,on:true})});render();toast("Palavra do dia às "+t);};
+  }
   async function saveName(){app.name=($("#nameInput").value||"").trim();await saveApp({name:app.name});render();toast("Salvo");}
   async function saveGrat(){day=day||{completed:{},points:0,gratidao:"",mood:0};day.gratidao=($("#gratInput").value||"").trim();
     try{await dayRef.set({completed:day.completed||{},points:day.points||0,gratidao:day.gratidao,mood:day.mood||0});toast("Gratidão guardada");}catch(e){toast("Não consegui salvar.");}}
@@ -735,6 +750,8 @@
   $("#wdBtn").onclick=()=>setWinddown(!winddown);
   $("#addRewardBtn").onclick=addReward;
   $("#addBlockBtn").onclick=()=>editBlock(null);
+  $("#mvEdit").onclick=editMorningVerse;
+  $("#mvToggle").onclick=async()=>{await saveApp({morningVerse:Object.assign(mv(),{on:!mv().on})});render();};
   $("#gratSave").onclick=saveGrat;
   $("#nameSave").onclick=saveName;
   $("#weekendToggle").onclick=async()=>{weekendFlex=!weekendFlex;app.weekendFlex=weekendFlex;render();await saveApp({weekendFlex});};
@@ -755,7 +772,9 @@
   function persist(){try{localStorage.setItem("mjState",JSON.stringify(STORE));}catch(e){}saveRemote();}
   function makeDayRef(d){return{set:async(o)=>{STORE.days[d]=o;if(d===dateKey)day=o;persist();},onSnapshot:cb=>{cb({exists:!!STORE.days[d],data:()=>STORE.days[d]});return ()=>{};}};}
   appRef={update:async p=>{Object.assign(app,p);STORE.app=app;persist();syncSchedule();},set:async o=>{app=o;STORE.app=app;persist();syncSchedule();},get:async()=>({exists:!!STORE.app,data:()=>STORE.app}),collection:()=>({doc:d=>makeDayRef(d)})};
-  function buildSchedule(){const out=[];((app&&app.blocks)||[]).forEach(b=>{if(!b.enabled)return;(b.times||[]).forEach(t=>out.push({t:t,label:b.label}));});return out;}
+  function buildSchedule(){const out=[];((app&&app.blocks)||[]).forEach(b=>{if(!b.enabled)return;(b.times||[]).forEach(t=>out.push({t:t,label:b.label}));});
+    const v=mv();if(v.on)out.push({t:v.t,label:"Palavra de hoje",kind:"verso"}); // mj-push troca pelo versículo do dia + "Lembre-se de orar"
+    return out;}
   let syncT=null;
   function syncSchedule(){if(!sb)return;clearTimeout(syncT);syncT=setTimeout(async()=>{try{await sb.from("mj_devices").upsert({id:deviceId,schedule:buildSchedule(),tz:"America/Sao_Paulo",enabled:true,user_id:(currentUser?currentUser.id:null),last_seen:new Date().toISOString()});}catch(e){}},900);}
   function urlB64(s){const pad="=".repeat((4-s.length%4)%4);const b=(s+pad).replace(/-/g,"+").replace(/_/g,"/");const raw=atob(b);const arr=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)arr[i]=raw.charCodeAt(i);return arr;}
