@@ -315,6 +315,13 @@
         <div class="mid"><div class="sl-k">Sua noite</div><div class="sl-v" id="sleepLine"></div><div class="sl-goal" id="sleepGoal"></div></div>
         <div class="sl-dur" id="sleepDur"></div>
       </div>
+      <div class="sleepcard" id="screenCard" hidden>
+        <span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg></span>
+        <div class="mid"><div class="sl-k">Redes sociais hoje</div>
+          <div class="bar" style="margin-top:7px"><span id="screenBar" style="width:0%"></span></div>
+          <div class="sl-goal" id="screenNote"></div></div>
+        <div class="sl-dur" id="screenDur"></div>
+      </div>
       <div class="cheer" id="cheer" hidden><svg class="i" viewBox="0 0 24 24"><path d="M12 3l1.9 3.9 4.3.6-3.1 3 .7 4.3L12 16.8 8.2 14.8l.7-4.3-3.1-3 4.3-.6L12 3Z"/></svg>Você apareceu hoje. Isso já é vitória.</div>
       <div class="mood">
         <div class="mood-top"><span>Como você está hoje?</span><span class="mood-label" id="moodLabel"></span></div>
@@ -416,6 +423,27 @@
           <li>Toque em <b>＋ Adicionar novo campo → Texto</b>. Chave: <b>bed</b>. No Texto, escolha <b>Amostras de Saúde</b> em cima do teclado, toque na bolinha azul e escolha <b>Data de Início</b>.</li>
           <li>De novo <b>＋ Adicionar novo campo → Texto</b>. Chave: <b>wake</b>. Texto: <b>Amostras de Saúde</b> → <b>Data de Término</b>.</li>
           <li>Toque em <b>▶️</b> pra testar: deve aparecer <b>"Sono registrado"</b>. Se você costuma acordar depois das 10h, ponha a automação mais tarde.</li>
+        </ol></div></details>
+
+      <div class="eyebrow">Redes sociais — tempo de tela</div>
+      <div class="card">
+        <div class="rowcard" style="margin-top:0"><div class="mid" style="flex:1"><div class="nm" style="font-weight:600">Limite por dia</div>
+          <div class="times" id="screenLimitTxt" style="color:var(--muted);font-size:12.5px;margin-top:3px"></div></div>
+          <button class="btn sm ghost" id="screenLimitEdit">Mudar</button></div>
+        <div id="screenUrls" hidden style="margin-top:14px">
+          <label class="fld">Endereço "app aberto"</label>
+          <div class="rowcard" style="margin-top:0"><input type="text" id="screenOpenUrl" readonly><button class="btn sm" data-copy="screenOpenUrl">Copiar</button></div>
+          <label class="fld" style="margin-top:12px">Endereço "app fechado"</label>
+          <div class="rowcard" style="margin-top:0"><input type="text" id="screenCloseUrl" readonly><button class="btn sm" data-copy="screenCloseUrl">Copiar</button></div>
+        </div>
+        <p class="hint" id="screenHint">O iPhone não deixa nenhum app ler o Tempo de Uso. Então duas automações do Atalhos avisam o My Journey quando você abre e fecha as redes — e a gente mede.</p>
+      </div>
+      <details class="guide"><summary><span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg></span>Como montar as automações das redes<span class="plus">＋</span></summary>
+        <div class="gc">São <b>duas automações</b>, cada uma com <b>uma ação só</b>. Não precisa de campo nenhum.<ol>
+          <li><b>Atalhos → Automação → ＋ → App</b>. Toque em <b>Escolher</b> e marque Instagram, Facebook, WhatsApp (e o que mais quiser medir). Deixe marcado só <b>É Aberto</b>. <b>Executar Imediatamente</b> → Seguinte → <b>Novo Atalho em Branco</b>.</li>
+          <li>Busque <b>Obter Conteúdo do URL</b>, toque em <b>URL</b> e cole o endereço <b>"app aberto"</b> daqui de cima. Toque em OK. Pronto, a primeira acabou.</li>
+          <li>Crie a segunda igual: <b>＋ → App</b>, os <b>mesmos apps</b>, mas marque só <b>É Fechado</b>. Cole o endereço <b>"app fechado"</b>.</li>
+          <li>Teste: abra o Instagram, saia, e volte aqui. O cartão "Redes sociais hoje" aparece em Hoje.</li>
         </ol></div></details>
 
       <div class="eyebrow">iPhone — reforço (opcional)</div>
@@ -571,7 +599,7 @@
     if($("#verseTextHoje")){$("#verseTextHoje").textContent=VERSES[vi][0];$("#verseRefHoje").textContent=VERSES[vi][1];}
     $("#gratInput").value=(day&&day.gratidao)||"";
 
-    renderRewards();renderBlockEditor();renderMood();renderJornada();renderSleep();renderSpecials();renderGratitude();renderReport();
+    renderRewards();renderBlockEditor();renderMood();renderJornada();renderSleep();renderSpecials();renderGratitude();renderScreen();renderReport();
     $("#weekendToggle").classList.toggle("on",weekendFlex);
   }
   function taskRow(x){
@@ -781,10 +809,14 @@
   // ---- relatório do dia: mesma regra do servidor (mj-push → dayReport) ----
   function dayReport(){
     const inst=instances();const n=inst.length,k=inst.filter(x=>isDone(x.iid)).length,p=n?Math.round(k/n*100):0;
-    const grat=!!gratOf(dateKey);const color=p>=70&&grat?"verde":p<35?"vermelho":"amarelo";
+    const grat=!!gratOf(dateKey);let color=p>=70&&grat?"verde":p<35?"vermelho":"amarelo";
+    // redes acima do limite: no máximo amarelo; acima do dobro: vermelho
+    const sm=screenEvents.length?screenMinutes(screenEvents):null,lim=screenLimit();
+    if(sm!=null&&sm>2*lim)color="vermelho";else if(sm!=null&&sm>lim&&color==="verde")color="amarelo";
     const missing=[...new Set(inst.filter(x=>!isDone(x.iid)&&x.b.critical).map(x=>x.b.label))].slice(0,3);
     const lines=[k+" de "+n+" da rotina ("+p+"%)",grat?"Gratidão feita ✓":"Falta a gratidão — ainda dá tempo."];
     const sg=sleepGoal();if(sg&&sg.late!=null)lines.push(sg.late>15?("Deitou "+durTxt(sg.late)+" depois da meta"):"Dormiu na meta ✓");
+    if(sm!=null)lines.push(sm>lim?("⚠ "+durTxt(sm)+" em redes sociais (limite "+durTxt(lim)+")"):(durTxt(sm)+" em redes sociais ✓"));
     if(missing.length)lines.push("Faltou: "+missing.join(", "));
     return{color,lines};
   }
@@ -859,17 +891,19 @@
   // ---- sono: vem do app Saúde via Atalhos (Edge Function mj-sleep grava em mj_sleep) ----
   let sleepRows=[],sleepToken=null;
   const hhmm=iso=>{const d=new Date(iso);return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");};
-  const durTxt=m=>Math.floor(m/60)+"h"+String(m%60).padStart(2,"0");
+  const durTxt=m=>m<60?m+" min":Math.floor(m/60)+"h"+String(m%60).padStart(2,"0");
   const sleepUrl=()=>SB_URL+"/functions/v1/mj-sleep?t="+sleepToken;
   async function loadSleep(){
     if(!sb||!currentUser)return;
     try{
       const since=todayStr(new Date(Date.now()-13*864e5));
-      const [r,t]=await Promise.all([
+      const dayStart=new Date();dayStart.setHours(0,0,0,0);
+      const [r,t,sc]=await Promise.all([
         sb.from("mj_sleep").select("night,bed,wake,minutes").gte("night",since).order("night"),
-        sb.from("mj_tokens").select("token").maybeSingle()]);
-      sleepRows=(r&&r.data)||[];sleepToken=(t&&t.data&&t.data.token)||null;
-      renderSleep();renderReport();autoWake();
+        sb.from("mj_tokens").select("token").maybeSingle(),
+        sb.from("mj_screen").select("at,ev").gte("at",dayStart.toISOString()).order("at")]);
+      sleepRows=(r&&r.data)||[];sleepToken=(t&&t.data&&t.data.token)||null;screenEvents=(sc&&sc.data)||[];
+      renderSleep();renderScreen();renderReport();autoWake();
     }catch(e){}
   }
   // meta de sono = primeiro horário do bloco Dormir; conta em "minutos desde o meio-dia" pra atravessar a meia-noite
@@ -918,10 +952,38 @@
     if(!sb||!currentUser){toast("Entre na sua conta primeiro.");return;}
     const a=new Uint8Array(24);crypto.getRandomValues(a);const tk=Array.from(a,b=>b.toString(16).padStart(2,"0")).join("");
     try{const r=await sb.from("mj_tokens").upsert({user_id:currentUser.id,token:tk});if(r.error)throw r.error;
-      sleepToken=tk;renderSleep();toast("Código gerado — copie e cole no atalho");}catch(e){toast("Não consegui gerar. Tenta de novo.");}
+      sleepToken=tk;renderSleep();renderScreen();toast("Código gerado — copie e cole no atalho");}catch(e){toast("Não consegui gerar. Tenta de novo.");}
   }
   $("#sleepGen").onclick=genSleepToken;
   $("#sleepCopy").onclick=async()=>{try{await navigator.clipboard.writeText(sleepUrl());toast("Copiado");}catch(e){$("#sleepUrl").select();toast("Segure e copie o endereço");}};
+
+  // ---- redes sociais: eventos abrir/fechar (Edge Function mj-tela grava em mj_screen) ----
+  // pareia cada "close" com o "open" mais recente antes dele; sessão > 3h é descartada (evento perdido)
+  // mesma regra no servidor (mj-push → screenMinutes)
+  let screenEvents=[];
+  function screenMinutes(evs){let start=null,tot=0;
+    evs.forEach(e=>{const t=new Date(e.at).getTime();if(e.ev==="open")start=t;else if(start!=null){const d=t-start;if(d>0&&d<=3*3600e3)tot+=d;start=null;}});
+    return Math.round(tot/60000);}
+  const screenLimit=()=>app.screenLimit||90;
+  const screenUrl=ev=>SB_URL+"/functions/v1/mj-tela?t="+sleepToken+"&ev="+ev;
+  function renderScreen(){
+    const m=screenMinutes(screenEvents),lim=screenLimit();
+    $("#screenCard").hidden=!screenEvents.length;
+    if(screenEvents.length){$("#screenDur").textContent=durTxt(m);$("#screenBar").style.width=Math.min(100,m/lim*100)+"%";
+      const n=$("#screenNote");n.classList.toggle("late",m>lim);
+      n.textContent=m>lim?("Passou "+durTxt(m-lim)+" do limite ("+durTxt(lim)+")"):("Limite: "+durTxt(lim)+" · sobram "+durTxt(lim-m));}
+    $("#screenLimitTxt").textContent=durTxt(lim)+" em redes sociais. Passou disso, o relatório da noite avisa.";
+    $("#screenUrls").hidden=!sleepToken;
+    if(sleepToken){$("#screenOpenUrl").value=screenUrl("open");$("#screenCloseUrl").value=screenUrl("close");}
+    $("#screenHint").textContent=sleepToken?"O iPhone não deixa nenhum app ler o Tempo de Uso. Então duas automações do Atalhos avisam o My Journey quando você abre e fecha as redes — e a gente mede.":"Primeiro gere seu código na seção Sono aqui em cima — o mesmo código serve pras redes.";
+  }
+  document.querySelectorAll("[data-copy]").forEach(b=>b.onclick=async()=>{const inp=$("#"+b.dataset.copy);
+    try{await navigator.clipboard.writeText(inp.value);toast("Copiado");}catch(e){inp.select();toast("Segure e copie o endereço");}});
+  $("#screenLimitEdit").onclick=()=>{
+    openModal('<div class="mq">Limite de redes sociais</div><div class="form-row"><label class="fld">Minutos por dia</label><input type="number" id="slMin" value="'+screenLimit()+'" min="10" step="10"></div><div class="actions"><button class="btn ghost" data-close>Cancelar</button><button class="btn" id="slSave">Salvar</button></div>');
+    $("#slSave").onclick=async()=>{const v=parseInt($("#slMin").value||"0",10);if(!v||v<10){toast("Mínimo de 10 minutos.");return;}
+      closeModal();await saveApp({screenLimit:v});render();toast("Limite: "+durTxt(v));};
+  };
   let currentUser=null,saveT=null,authMode="login";
   function saveRemote(){if(!sb||!currentUser)return;clearTimeout(saveT);saveT=setTimeout(async()=>{try{await sb.from("mj_state").upsert({user_id:currentUser.id,data:STORE,updated_at:new Date().toISOString()});}catch(e){}},1000);}
   function initApp(){
