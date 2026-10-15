@@ -259,10 +259,8 @@
   .word-ref{color:var(--muted);letter-spacing:.06em}
   .word-key{font-family:var(--display);font-size:22px;line-height:1.38;font-weight:500;margin-top:10px;text-wrap:pretty}
   .word-key::before{content:"“";color:var(--accent)}.word-key::after{content:"”";color:var(--accent)}
-  .word-psg{margin-top:12px;font-family:var(--display);font-size:15px;line-height:1.65;color:var(--muted);
-    max-height:5.1em;overflow:hidden;-webkit-mask-image:linear-gradient(#000 45%,transparent);mask-image:linear-gradient(#000 45%,transparent)}
-  .word-psg:empty{display:none}
-  .word.open .word-psg{max-height:none;-webkit-mask-image:none;mask-image:none}
+  .word-psg{display:none;margin-top:12px;font-family:var(--display);font-size:15px;line-height:1.65;color:var(--muted)}
+  .word.open .word-psg:not(:empty){display:block;animation:fade .3s ease}
   .word-psg sup{font-family:var(--ui);font-size:9.5px;color:var(--faint);margin-right:3px;font-weight:700}
   .word-psg .key{color:var(--fg)}
   .word-more{margin-top:8px}
@@ -425,7 +423,7 @@
 
     <section class="view" id="v-fe">
       <div class="eyebrow">Palavra de hoje</div>
-      <div class="word open" id="wordFe"><div class="word-k">Palavra de hoje<span class="word-ref"></span></div><div class="word-key"></div>
+      <div class="word" id="wordFe"><div class="word-k">Palavra de hoje<span class="word-ref"></span></div><div class="word-key"></div>
         <div class="word-psg"></div><button class="linkbtn word-more" hidden>Ler o trecho todo</button></div>
       <div class="eyebrow">Gratidão de hoje</div>
       <div class="card">
@@ -820,8 +818,10 @@
       w.querySelector(".word-key").textContent=key?key.t:VERSES[i][0];
       const ps=w.querySelector(".word-psg");ps.innerHTML="";
       (passage||[]).forEach(v=>{const s=el("span","wv"+(v.n===p[5]?" key":""));s.innerHTML="<sup>"+v.n+"</sup>";s.appendChild(document.createTextNode(v.t+" "));ps.appendChild(s);});
-      const more=w.querySelector(".word-more");more.hidden=!passage||w.classList.contains("open");
-      more.onclick=()=>{w.classList.add("open");more.hidden=true;};});
+      // trecho começa escondido: o botão abre e fecha
+      const more=w.querySelector(".word-more");more.hidden=!passage;
+      more.textContent=w.classList.contains("open")?"Esconder trecho":"Ler o trecho ("+p[0]+")";
+      more.onclick=()=>{w.classList.toggle("open");more.textContent=w.classList.contains("open")?"Esconder trecho":"Ler o trecho ("+p[0]+")";};});
   }
   function dayIndex(){const d=new Date();return Math.floor(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5);}
 
