@@ -55,8 +55,9 @@
   .i{width:22px;height:22px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
 
   /* ---- header ---- */
-  header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;
-    background:var(--bg);padding:14px 20px 12px;border-bottom:1px solid var(--line)}
+  /* top:0 + padding do notch: com top=safe-area o cabeçalho descia e cobria o card */
+  header.top{position:sticky;top:0;z-index:20;
+    background:var(--bg);padding:calc(14px + env(safe-area-inset-top,0px)) 20px 12px;border-bottom:1px solid var(--line)}
   .brandrow{display:flex;align-items:center;gap:10px}
   .mark{width:30px;height:30px;color:var(--accent);flex:none}
   .brandrow .nm{font-family:var(--display);font-weight:600;font-size:17px;letter-spacing:.2px}
