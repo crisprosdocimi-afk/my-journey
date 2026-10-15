@@ -886,7 +886,10 @@
       LS("mj_push","1");updatePushUI();toast("Notificações ativadas!");
     }catch(e){toast("Não consegui ativar. Abra pelo ícone da Tela de Início e tente de novo.");}
   }
-  document.addEventListener("visibilitychange",()=>{if(document.hidden)return;const t=todayStr();if(t!==dateKey){dateKey=t;dayRef=makeDayRef(dateKey);day=STORE.days[dateKey]||{completed:{},points:0,gratidao:"",mood:0};render();}loadSleep();});
+  document.addEventListener("visibilitychange",()=>{if(document.hidden)return;const t=todayStr();if(t!==dateKey){dateKey=t;dayRef=makeDayRef(dateKey);day=STORE.days[dateKey]||{completed:{},points:0,gratidao:"",mood:0};render();}
+    // de novo depois de 5s: ao sair do Instagram o aviso "fechou" chega junto com a volta pro app
+    loadSleep();setTimeout(loadSleep,5000);});
+  setInterval(()=>{if(!document.hidden)loadSleep();},60000); // e a cada minuto com o app aberto
 
   // ---- sono: vem do app Saúde via Atalhos (Edge Function mj-sleep grava em mj_sleep) ----
   let sleepRows=[],sleepToken=null;
