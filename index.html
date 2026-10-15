@@ -383,7 +383,7 @@
   <p class="hint" id="gateHint" style="max-width:34ch"></p>
   <form id="authForm" hidden style="width:100%;max-width:300px;display:flex;flex-direction:column;gap:9px;margin-top:4px">
     <input type="email" id="authEmail" placeholder="Seu e-mail" autocomplete="email" required>
-    <input type="password" id="authPass" placeholder="Senha (mín. 6 caracteres)" autocomplete="current-password" minlength="6" required>
+    <input type="password" id="authPass" placeholder="Senha: 8+ com maiúscula, nº e símbolo" autocomplete="current-password" minlength="8" required>
     <button class="btn block" id="authSubmit" type="submit" style="margin-top:2px">Entrar</button>
     <button class="btn ghost block" id="authToggle" type="button" style="margin-top:0">Criar conta nova</button>
     <div class="hint" id="authMsg" style="margin-top:2px;text-align:center"></div>
@@ -727,19 +727,23 @@
       $("#authPass").setAttribute("autocomplete",authMode==="login"?"current-password":"new-password");$("#authMsg").textContent="";};
     f.onsubmit=async(e)=>{e.preventDefault();if(!sb){$("#authMsg").textContent="Sem conexão com o servidor.";return;}
       const email=($("#authEmail").value||"").trim();const pass=$("#authPass").value||"";
-      if(!email||pass.length<6){$("#authMsg").textContent="Informe e-mail e senha (mín. 6).";return;}
+      if(!email||pass.length<8){$("#authMsg").textContent="E-mail e senha (mín. 8, com maiúscula, número e símbolo).";return;}
       $("#authSubmit").disabled=true;$("#authMsg").textContent="Um instante…";
       try{
-        let res;
-        if(authMode==="signup"){res=await sb.auth.signUp({email:email,password:pass});if(res.error)throw res.error;
-          if(!res.data.session){res=await sb.auth.signInWithPassword({email:email,password:pass});if(res.error)throw res.error;}}
-        else{res=await sb.auth.signInWithPassword({email:email,password:pass});if(res.error)throw res.error;}
-        await afterLogin((res.data&&(res.data.user||(res.data.session&&res.data.session.user))));
+        if(authMode==="signup"){
+          const r=await sb.auth.signUp({email:email,password:pass});if(r.error)throw r.error;
+          if(r.data&&r.data.session){await afterLogin(r.data.session.user);}
+          else{$("#authMsg").textContent="Conta criada! Enviei um link de confirmação pro seu e-mail — abra ele e toque em Entrar. (ou me chama que eu libero na hora)";authMode="login";$("#authSubmit").textContent="Entrar";$("#authToggle").textContent="Criar conta nova";}
+        }else{
+          const r=await sb.auth.signInWithPassword({email:email,password:pass});if(r.error)throw r.error;
+          await afterLogin(r.data.user||(r.data.session&&r.data.session.user));
+        }
       }catch(err){const m=((err&&err.message)||"").toLowerCase();
-        $("#authMsg").textContent = m.indexOf("confirm")>=0?"Confirme seu e-mail (veja a caixa de entrada), ou me avise pra eu liberar."
+        $("#authMsg").textContent = (m.indexOf("should contain")>=0||m.indexOf("weak")>=0||(m.indexOf("password")>=0&&m.indexOf("least")>=0))?"Senha fraca: use 8+ com maiúscula, minúscula, número e símbolo (ex.: MinhaVida2026!)."
+          :(m.indexOf("confirm")>=0||m.indexOf("not confirmed")>=0)?"Confirme pelo link no seu e-mail e toque em Entrar — ou me chama que eu libero."
           :m.indexOf("invalid")>=0?"E-mail ou senha incorretos."
           :(m.indexOf("already")>=0||m.indexOf("registered")>=0)?"Esse e-mail já tem conta — toque em Entrar."
-          :((err&&err.message)||"Não consegui entrar. Tente de novo.");
+          :((err&&err.message)||"Não consegui. Tente de novo.");
       }finally{$("#authSubmit").disabled=false;}
     };
   }
