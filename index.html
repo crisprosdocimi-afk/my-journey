@@ -486,8 +486,12 @@
         <div class="sect-body">
           <p class="hint" id="acaoNoToken" style="margin-top:0">Primeiro gere seu código em <b>Conta e privacidade</b> (último setor aqui embaixo).</p>
           <div id="acaoUrls" hidden>
-            <label class="fld">Academia — marca quando o treino termina</label>
+            <label class="fld">Academia — treino do Apple Watch terminou</label>
             <div class="rowcard" style="margin-top:0"><input type="text" id="acaoAcademia" readonly><button class="btn sm" data-copy="acaoAcademia">Copiar</button></div>
+            <label class="fld" style="margin-top:12px">Academia — chegou (localização)</label>
+            <div class="rowcard" style="margin-top:0"><input type="text" id="acaoAcadChegou" readonly><button class="btn sm" data-copy="acaoAcadChegou">Copiar</button></div>
+            <label class="fld" style="margin-top:12px">Academia — saiu (só conta se ficou 30 min)</label>
+            <div class="rowcard" style="margin-top:0"><input type="text" id="acaoAcadSaiu" readonly><button class="btn sm" data-copy="acaoAcadSaiu">Copiar</button></div>
             <label class="fld" style="margin-top:12px">Escritório — marca quando você chega lá</label>
             <div class="rowcard" style="margin-top:0"><input type="text" id="acaoEscritorio" readonly><button class="btn sm" data-copy="acaoEscritorio">Copiar</button></div>
             <label class="fld" style="margin-top:12px">Gratidão pela Siri</label>
@@ -496,8 +500,11 @@
           <details class="guide"><summary><span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><path d="M4 9v6M7 7v10M17 7v10M20 9v6M7 12h10"/></svg></span>Academia automática<span class="plus">＋</span></summary>
             <div class="gc"><b>Com Apple Watch:</b><ol>
               <li><b>Atalhos → Automação → ＋ → Treino do Apple Watch</b>. Escolha <b>Termina</b> (qualquer treino). <b>Executar Imediatamente</b> → <b>Novo Atalho em Branco</b>.</li>
-              <li>Busque <b>Obter Conteúdo do URL</b> e cole o endereço da <b>Academia</b>. OK.</li></ol>
-              <b>Sem relógio:</b> mesma coisa, mas em vez de Treino escolha <b>Sair</b> → o endereço da academia (marca quando você vai embora de lá).</div></details>
+              <li>Busque <b>Obter Conteúdo do URL</b> e cole o endereço <b>"treino do Apple Watch terminou"</b>. OK.</li></ol>
+              <b>Sem relógio (localização)</b> — são duas, e só conta se você ficar <b>30 min</b> lá dentro (passar na frente ou ir na padaria do lado não conta):<ol>
+              <li><b>＋ → Chegar</b> → Local: a academia → Executar Imediatamente → <b>Obter Conteúdo do URL</b> com o endereço <b>"chegou"</b>.</li>
+              <li><b>＋ → Sair</b> → Local: a academia → Executar Imediatamente → <b>Obter Conteúdo do URL</b> com o endereço <b>"saiu"</b>.</li></ol>
+              Se treinar com o relógio e as duas dispararem, conta uma vez só.</div></details>
           <details class="guide"><summary><span class="ic-chip"><svg class="i" viewBox="0 0 24 24"><rect x="5" y="3.5" width="14" height="17" rx="1.5"/><path d="M9 7.5h2M13 7.5h2M9 11h2M13 11h2M10 20.5v-3h4v3"/></svg></span>Escritório automático<span class="plus">＋</span></summary>
             <div class="gc"><ol>
               <li><b>Atalhos → Automação → ＋ → Chegar</b>. Toque em <b>Local</b> e escolha o endereço do escritório. <b>Executar Imediatamente</b> → <b>Novo Atalho em Branco</b>.</li>
@@ -1079,7 +1086,8 @@
   const acaoUrl=q=>SB_URL+"/functions/v1/mj-acao?t="+sleepToken+"&"+q;
   function renderAcoes(){
     $("#acaoUrls").hidden=!sleepToken;$("#acaoNoToken").hidden=!!sleepToken;
-    if(sleepToken){$("#acaoAcademia").value=acaoUrl("do=feito&bloco=academia");$("#acaoEscritorio").value=acaoUrl("do=feito&bloco=escritorio");$("#acaoGratidao").value=acaoUrl("do=gratidao");}
+    if(sleepToken){$("#acaoAcademia").value=acaoUrl("do=feito&bloco=academia");
+      $("#acaoAcadChegou").value=acaoUrl("do=chegou&bloco=academia");$("#acaoAcadSaiu").value=acaoUrl("do=saiu&bloco=academia&min=30");$("#acaoEscritorio").value=acaoUrl("do=feito&bloco=escritorio");$("#acaoGratidao").value=acaoUrl("do=gratidao");}
   }
 
   // link vindo da notificação: ?feito=<bloco>&t=<hh:mm> pergunta "Feito?"; ?abrir=<aba> abre a aba
